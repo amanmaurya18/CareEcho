@@ -1,0 +1,118 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #FBFBFA;
+  --foreground: #0F172A;
+  --card: #FFFFFF;
+  --card-border: #E2E8F0;
+  --sage-primary: #2D6A4F;
+  --sage-hover: #1B4332;
+  --amber-pending: #D97706;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-size: 1.125rem; /* 18px base for elderly accessibility */
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Accessible focus ring for keyboard navigation */
+*:focus-visible {
+  outline: 3px solid #2D6A4F;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* High Contrast Mode */
+.high-contrast {
+  --background: #FFFFFF;
+  --foreground: #000000;
+  --card: #FFFFFF;
+  --card-border: #000000;
+  --sage-primary: #004D20;
+  --sage-hover: #002B12;
+  --amber-pending: #8A4000;
+}
+
+.high-contrast body {
+  background-color: #FFFFFF !important;
+  color: #000000 !important;
+}
+
+.high-contrast .card-contrast {
+  border: 2px solid #000000 !important;
+  box-shadow: none !important;
+}
+
+.high-contrast button {
+  border: 2px solid currentColor !important;
+}
+
+.high-contrast *:focus-visible {
+  outline: 4px solid #000000 !important;
+  outline-offset: 4px;
+}
+
+/* Subtle voice orb animation */
+@keyframes orb-glow {
+  0%, 100% {
+    box-shadow: 0 0 25px rgba(45, 106, 79, 0.25), 0 0 50px rgba(45, 106, 79, 0.15);
+  }
+  50% {
+    box-shadow: 0 0 45px rgba(45, 106, 79, 0.45), 0 0 80px rgba(45, 106, 79, 0.25);
+  }
+}
+
+.animate-orb-glow {
+  animation: orb-glow 3s infinite ease-in-out;
+}
+
+@keyframes listening-wave {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.4;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+}
+
+.animate-listening {
+  animation: listening-wave 1.5s infinite ease-in-out;
+}
+
+/* Hide scrollbar utilities */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Sleek mobile device scrollbar */
+.device-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+.device-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.device-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.4);
+  border-radius: 9999px;
+}
+.device-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.7);
+}
+

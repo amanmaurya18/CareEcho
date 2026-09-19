@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1180" viewBox="0 0 900 1180">
+  <rect width="900" height="1180" fill="#fdfcf9"/>
+  <rect x="0" y="0" width="900" height="150" fill="#f3f6f4"/>
+  <line x1="0" y1="150" x2="900" y2="150" stroke="#2d6a4f" stroke-width="4"/>
+  <text x="50" y="70" font-family="Georgia, serif" font-size="44" font-weight="bold" fill="#143d2b">SUNRISE FAMILY CLINIC</text>
+  <text x="50" y="115" font-family="Georgia, serif" font-size="26" fill="#3f3f46">Dr. R. K. Mehta, MBBS, MD (General Medicine) · Reg. No. 41287</text>
+  <text x="850" y="70" text-anchor="end" font-family="Georgia, serif" font-size="24" fill="#3f3f46">Ph: 0512-255-8890</text>
+  <text x="850" y="105" text-anchor="end" font-family="Georgia, serif" font-size="24" fill="#3f3f46">Kanpur, U.P.</text>
+
+  <text x="50" y="215" font-family="Arial, sans-serif" font-size="28" fill="#0f172a">Patient: <tspan font-weight="bold">Sudha Devi</tspan></text>
+  <text x="50" y="255" font-family="Arial, sans-serif" font-size="26" fill="#3f3f46">Age: 74 yrs / F &#160;&#160;·&#160;&#160; Date: 12 Sep 2026 &#160;&#160;·&#160;&#160; BP: 148/92</text>
+  <line x1="50" y1="280" x2="850" y2="280" stroke="#d4d4d8" stroke-width="2"/>
+
+  <text x="50" y="360" font-family="Georgia, serif" font-size="56" font-style="italic" font-weight="bold" fill="#2d6a4f">Rx</text>
+
+  <g font-family="Arial, sans-serif" fill="#0f172a">
+    <text x="140" y="420" font-size="34" font-weight="bold">1. Tab. AMLODIPINE 5 mg</text>
+    <text x="170" y="462" font-size="28" fill="#3f3f46">1 – 0 – 0  (morning, after breakfast)  × 30 days</text>
+
+    <text x="140" y="545" font-size="34" font-weight="bold">2. Tab. METFORMIN 500 mg</text>
+    <text x="170" y="587" font-size="28" fill="#3f3f46">1 – 0 – 1  (after food, morning &amp; night)  × 30 days</text>
+
+    <text x="140" y="670" font-size="34" font-weight="bold">3. Tab. ATORVASTATIN 10 mg</text>
+    <text x="170" y="712" font-size="28" fill="#3f3f46">0 – 0 – 1  (at bedtime)  × 30 days</text>
+  </g>
+
+  <line x1="50" y1="770" x2="850" y2="770" stroke="#d4d4d8" stroke-width="2"/>
+  <text x="50" y="830" font-family="Arial, sans-serif" font-size="30" font-weight="bold" fill="#b45309">Advice:</text>
+  <g font-family="Arial, sans-serif" font-size="27" fill="#3f3f46">
+    <text x="50" y="875">• Low-salt, low-oil diet. Avoid pickles &amp; papad.</text>
+    <text x="50" y="915">• 30-minute gentle walk every morning.</text>
+    <text x="50" y="955">• Check BP twice weekly; review after 30 days.</text>
+  </g>
+
+  <text x="700" y="1080" text-anchor="middle" font-family="Brush Script MT, cursive" font-size="46" fill="#143d2b">R. K. Mehta</text>
+  <line x1="560" y1="1100" x2="850" y2="1100" stroke="#a1a1aa" stroke-width="2"/>
+  <text x="700" y="1140" text-anchor="middle" font-family="Arial, sans-serif" font-size="22" fill="#71717a">Signature &amp; Seal</text>
+</svg>

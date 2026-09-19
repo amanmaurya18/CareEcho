@@ -1,0 +1,95 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ------------------------------------------------------------------ */
+/* Warm Minimalism design tokens                                       */
+/* Light mode = daytime legibility; .hc = high-contrast switch         */
+/* ------------------------------------------------------------------ */
+
+:root {
+  --c-bg-rgb: 251 251 250; /* #FBFBFA warm off-white */
+  --c-card-rgb: 255 255 255;
+  --c-line-rgb: 228 228 231; /* zinc-200 */
+  --c-ink-rgb: 15 23 42; /* slate-900 */
+  --c-soft-rgb: 63 63 70; /* zinc-700 — AAA on white for body text */
+  --c-sage-rgb: 45 106 79; /* #2D6A4F soft sage green */
+  --c-amber-rgb: 180 83 9; /* amber-700 — AAA on white */
+  --c-danger-rgb: 185 28 28; /* red-700 — AAA on white */
+  --c-ring: #0f172a;
+}
+
+html.hc {
+  --c-bg-rgb: 255 255 255;
+  --c-card-rgb: 255 255 255;
+  --c-line-rgb: 0 0 0;
+  --c-ink-rgb: 0 0 0;
+  --c-soft-rgb: 17 17 17;
+  --c-sage-rgb: 11 93 55;
+  --c-amber-rgb: 124 63 0;
+  --c-danger-rgb: 163 0 0;
+  --c-ring: #000000;
+}
+
+html {
+  /* Accessibility floor: 18px base */
+  font-size: 18px;
+}
+
+body {
+  background: rgb(var(--c-bg-rgb));
+  color: rgb(var(--c-ink-rgb));
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* High-contrast mode: heavier borders + bolder text everywhere */
+html.hc .card-surface {
+  border-width: 2px !important;
+  box-shadow: none !important;
+}
+html.hc body {
+  font-weight: 500;
+}
+
+/* Focus visibility — keyboard users get a fat, unmistakable ring */
+*:focus-visible {
+  outline: 3px solid var(--c-ring);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+@layer components {
+  .card-surface {
+    @apply rounded-2xl border border-line bg-card shadow-card;
+  }
+  .tap-target {
+    @apply min-h-[48px] min-w-[48px];
+  }
+  .btn-primary {
+    @apply tap-target inline-flex items-center justify-center gap-2 rounded-xl bg-ink px-6 py-4 text-lg font-semibold text-white transition hover:opacity-90 active:scale-[0.98];
+  }
+  .btn-secondary {
+    @apply tap-target inline-flex items-center justify-center gap-2 rounded-xl border-2 border-line bg-card px-6 py-4 text-lg font-semibold text-ink transition hover:border-ink active:scale-[0.98];
+  }
+  .btn-sage {
+    @apply tap-target inline-flex items-center justify-center gap-2 rounded-xl bg-sage px-6 py-4 text-lg font-semibold text-white transition hover:opacity-90 active:scale-[0.98];
+  }
+  .btn-danger-outline {
+    @apply tap-target inline-flex items-center justify-center gap-2 rounded-xl border-2 border-danger px-6 py-4 text-lg font-bold text-danger transition hover:bg-danger hover:text-white active:scale-[0.98];
+  }
+  .input-lg {
+    @apply tap-target w-full rounded-xl border-2 border-line bg-card px-4 py-3 text-lg text-ink placeholder:text-soft/60 focus:border-ink;
+  }
+}
+
+/* Respect users who ask for less motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001s !important;
+  }
+}

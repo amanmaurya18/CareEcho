@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1180" viewBox="0 0 900 1180">
+  <rect width="900" height="1180" fill="#fdfcf9"/>
+  <rect x="0" y="0" width="900" height="150" fill="#f6f4ef"/>
+  <line x1="0" y1="150" x2="900" y2="150" stroke="#b45309" stroke-width="4"/>
+  <text x="50" y="70" font-family="Georgia, serif" font-size="44" font-weight="bold" fill="#7c3f00">CITY HEART &amp; DIABETES CARE</text>
+  <text x="50" y="115" font-family="Georgia, serif" font-size="26" fill="#3f3f46">Dr. Anita Sharma, MBBS, DNB (Cardiology) · Reg. No. 55190</text>
+  <text x="850" y="70" text-anchor="end" font-family="Georgia, serif" font-size="24" fill="#3f3f46">Ph: 0512-270-1145</text>
+  <text x="850" y="105" text-anchor="end" font-family="Georgia, serif" font-size="24" fill="#3f3f46">Kanpur, U.P.</text>
+
+  <text x="50" y="215" font-family="Arial, sans-serif" font-size="28" fill="#0f172a">Patient: <tspan font-weight="bold">Sudha Devi</tspan></text>
+  <text x="50" y="255" font-family="Arial, sans-serif" font-size="26" fill="#3f3f46">Age: 74 yrs / F &#160;&#160;·&#160;&#160; Date: 02 Aug 2026 &#160;&#160;·&#160;&#160; HbA1c: 7.1%</text>
+  <line x1="50" y1="280" x2="850" y2="280" stroke="#d4d4d8" stroke-width="2"/>
+
+  <text x="50" y="355" font-family="Georgia, serif" font-size="56" font-style="italic" font-weight="bold" fill="#b45309">Rx</text>
+
+  <g font-family="Arial, sans-serif" fill="#0f172a">
+    <text x="140" y="410" font-size="33" font-weight="bold">1. Cap. PANTOPRAZOLE 40 mg</text>
+    <text x="170" y="450" font-size="27" fill="#3f3f46">1 – 0 – 0  (empty stomach, 30 min before breakfast)  × 15 days</text>
+
+    <text x="140" y="525" font-size="33" font-weight="bold">2. Tab. TELMISARTAN 40 mg</text>
+    <text x="170" y="565" font-size="27" fill="#3f3f46">1 – 0 – 0  (morning, after breakfast)  × 30 days</text>
+
+    <text x="140" y="640" font-size="33" font-weight="bold">3. Tab. CALCIUM + VITAMIN D3 (500 mg / 60000 IU)</text>
+    <text x="170" y="680" font-size="27" fill="#3f3f46">0 – 1 – 0  (afternoon, after lunch)  × 30 days</text>
+
+    <text x="140" y="755" font-size="33" font-weight="bold">4. Cap. GABAPENTIN 100 mg</text>
+    <text x="170" y="795" font-size="27" fill="#3f3f46">0 – 0 – 1  (at bedtime; may cause drowsiness)  × 30 days</text>
+  </g>
+
+  <line x1="50" y1="845" x2="850" y2="845" stroke="#d4d4d8" stroke-width="2"/>
+  <text x="50" y="900" font-family="Arial, sans-serif" font-size="30" font-weight="bold" fill="#b45309">Advice:</text>
+  <g font-family="Arial, sans-serif" font-size="27" fill="#3f3f46">
+    <text x="50" y="945">• Drink 6–8 glasses of water daily.</text>
+    <text x="50" y="985">• No driving after the night capsule.</text>
+  </g>
+
+  <text x="700" y="1080" text-anchor="middle" font-family="Brush Script MT, cursive" font-size="46" fill="#7c3f00">A. Sharma</text>
+  <line x1="560" y1="1100" x2="850" y2="1100" stroke="#a1a1aa" stroke-width="2"/>
+  <text x="700" y="1140" text-anchor="middle" font-family="Arial, sans-serif" font-size="22" fill="#71717a">Signature &amp; Seal</text>
+</svg>
