@@ -7,18 +7,34 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 const cleanEnv = (val?: string) => (val ? val.trim().replace(/^['"]|['"]$/g, '') : '');
 
 // Normalize base URL for Vercel / local development
-const rawUrl =
-  cleanEnv(process.env.NEXTAUTH_URL) ||
-  (process.env.VERCEL_URL ? `https://${cleanEnv(process.env.VERCEL_URL)}` : '') ||
-  (process.env.NODE_ENV === 'production'
-    ? 'https://care-echo-omega.vercel.app'
-    : 'http://localhost:3000');
+// On Vercel preview or branch deployments, prioritize VERCEL_URL so deployments stay on their own domain
+const isVercelPreview = process.env.VERCEL_ENV === 'preview';
+const isVercel = !!process.env.VERCEL;
 
-// Ensure NEXTAUTH_URL is populated without trailing slash
-const normalizedNextAuthUrl = rawUrl.replace(/\/+$/, '');
-if (!process.env.NEXTAUTH_URL) {
-  process.env.NEXTAUTH_URL = normalizedNextAuthUrl;
-}
+const getBaseUrl = (): string => {
+  // If we're on a Vercel preview deployment, always use the preview deployment's own URL
+  if (isVercelPreview && process.env.VERCEL_URL) {
+    return `https://${cleanEnv(process.env.VERCEL_URL)}`;
+  }
+  // If NEXTAUTH_URL is explicitly set and not localhost while running on Vercel
+  if (process.env.NEXTAUTH_URL && (!isVercel || !process.env.NEXTAUTH_URL.includes('localhost'))) {
+    return cleanEnv(process.env.NEXTAUTH_URL);
+  }
+  // Vercel auto-injected production URL
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
+    return `https://${cleanEnv(process.env.VERCEL_PROJECT_PRODUCTION_URL)}`;
+  }
+  // Current deployment URL provided by Vercel
+  if (process.env.VERCEL_URL) {
+    return `https://${cleanEnv(process.env.VERCEL_URL)}`;
+  }
+  return process.env.NODE_ENV === 'production'
+    ? 'https://care-echo-omega.vercel.app'
+    : 'http://localhost:3000';
+};
+
+const normalizedNextAuthUrl = getBaseUrl().replace(/\/+$/, '');
+process.env.NEXTAUTH_URL = normalizedNextAuthUrl;
 
 const googleClientId = cleanEnv(process.env.GOOGLE_CLIENT_ID);
 const googleClientSecret = cleanEnv(process.env.GOOGLE_CLIENT_SECRET);
@@ -115,6 +131,18 @@ export const authOptions: NextAuthOptions = {
         (token as any).role = (user as any).role || 'senior';
       }
       return token;
+    },
+    async redirect({ url, baseUrl }) {
+      // Relative paths
+      if (url.startsWith('/')) return `${baseUrl}${url}`;
+      // Same origin or trusted vercel preview domains
+      try {
+        const parsed = new URL(url);
+        if (parsed.origin === baseUrl || parsed.hostname.endsWith('.vercel.app')) {
+          return url;
+        }
+      } catch {}
+      return baseUrl;
     },
   },
   pages: {
