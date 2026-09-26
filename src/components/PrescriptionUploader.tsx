@@ -112,35 +112,35 @@ export const PrescriptionUploader: React.FC = () => {
     <div className="space-y-6">
       
       {/* Upload Zone & Presets Section */}
-      <div className="bg-[#FFFFFF] border-2 border-zinc-200 card-contrast rounded-3xl p-6 sm:p-8 shadow-sm">
+      <div className="bg-[#FFFFFF] border-2 border-zinc-200 card-contrast rounded-3xl p-4 sm:p-8 shadow-sm">
         
-        <div className="text-center max-w-2xl mx-auto mb-6">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-2">
+        <div className="text-center max-w-2xl mx-auto mb-4 sm:mb-6">
+          <h2 className="text-xl sm:text-3xl font-extrabold text-slate-900 mb-1.5 sm:mb-2 leading-tight">
             Prescription & Bottle Scanner
           </h2>
-          <p className="text-base sm:text-lg text-slate-600">
+          <p className="text-sm sm:text-lg text-slate-600 leading-relaxed">
             Take a photo or upload a prescription slip / medicine label. Google Gemini Vision automatically extracts medication details, timings, and instructions.
           </p>
         </div>
 
         {/* Preset Sample Buttons for 1-Click Instant Testing */}
-        <div className="bg-sage-50/70 border border-sage-200 rounded-2xl p-4 sm:p-5 mb-6">
-          <div className="flex items-center gap-2 text-sage-800 font-bold text-base mb-3">
-            <Sparkles className="w-5 h-5 text-sage-600" />
+        <div className="bg-sage-50/70 border border-sage-200 rounded-2xl p-3.5 sm:p-5 mb-4 sm:mb-6">
+          <div className="flex items-center gap-2 text-sage-800 font-bold text-sm sm:text-base mb-2.5 sm:mb-3">
+            <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-sage-600 shrink-0" />
             <span>Instant Test Presets (No Upload Needed):</span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
             <button
               onClick={() => handleLoadSample(SAMPLE_PRESCRIPTION_1, 'sample-cardio')}
-              className="min-h-tap p-3.5 bg-[#FFFFFF] hover:bg-sage-100/50 border-2 border-sage-300 rounded-xl text-left transition-all flex items-start gap-3 shadow-xs"
+              className="min-h-tap p-3 sm:p-3.5 bg-[#FFFFFF] hover:bg-sage-100/50 border-2 border-sage-300 rounded-xl text-left transition-all flex items-start gap-2.5 sm:gap-3 shadow-xs active:scale-[0.99]"
             >
-              <FileText className="w-6 h-6 text-sage-700 shrink-0 mt-0.5" />
+              <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-sage-700 shrink-0 mt-0.5" />
               <div>
-                <div className="font-bold text-slate-900 text-base">
+                <div className="font-bold text-slate-900 text-sm sm:text-base">
                   Sample 1: Cardiology Care Plan
                 </div>
-                <div className="text-xs sm:text-sm text-slate-600">
+                <div className="text-xs sm:text-sm text-slate-600 mt-0.5">
                   Lisinopril 10mg, Metformin 500mg, Atorvastatin 20mg
                 </div>
               </div>
@@ -148,14 +148,14 @@ export const PrescriptionUploader: React.FC = () => {
 
             <button
               onClick={() => handleLoadSample(SAMPLE_PRESCRIPTION_2, 'sample-geriatric')}
-              className="min-h-tap p-3.5 bg-[#FFFFFF] hover:bg-sage-100/50 border-2 border-sage-300 rounded-xl text-left transition-all flex items-start gap-3 shadow-xs"
+              className="min-h-tap p-3 sm:p-3.5 bg-[#FFFFFF] hover:bg-sage-100/50 border-2 border-sage-300 rounded-xl text-left transition-all flex items-start gap-2.5 sm:gap-3 shadow-xs active:scale-[0.99]"
             >
-              <FileText className="w-6 h-6 text-sage-700 shrink-0 mt-0.5" />
+              <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-sage-700 shrink-0 mt-0.5" />
               <div>
-                <div className="font-bold text-slate-900 text-base">
+                <div className="font-bold text-slate-900 text-sm sm:text-base">
                   Sample 2: Senior Wellness & Bones
                 </div>
-                <div className="text-xs sm:text-sm text-slate-600">
+                <div className="text-xs sm:text-sm text-slate-600 mt-0.5">
                   Amlodipine 5mg, Omeprazole 20mg, Calcium + D3
                 </div>
               </div>
@@ -164,7 +164,7 @@ export const PrescriptionUploader: React.FC = () => {
         </div>
 
         {/* Drag & Drop / Camera Dropzone */}
-        <div className="relative border-2 border-dashed border-zinc-300 hover:border-sage-500 rounded-2xl p-8 text-center transition-colors bg-zinc-50/50">
+        <div className="relative border-2 border-dashed border-zinc-300 hover:border-sage-500 rounded-2xl p-5 sm:p-8 text-center transition-colors bg-zinc-50/50">
           <input
             type="file"
             accept="image/*"
@@ -176,14 +176,14 @@ export const PrescriptionUploader: React.FC = () => {
           />
 
           <div className="flex flex-col items-center justify-center pointer-events-none">
-            <div className="w-16 h-16 rounded-full bg-zinc-100 border border-zinc-200 flex items-center justify-center mb-3 text-slate-700">
-              <Camera className="w-8 h-8 text-sage-600" />
+            <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-zinc-100 border border-zinc-200 flex items-center justify-center mb-2.5 sm:mb-3 text-slate-700">
+              <Camera className="w-6 h-6 sm:w-8 sm:h-8 text-sage-600" />
             </div>
 
-            <p className="text-lg sm:text-xl font-bold text-slate-900 mb-1">
+            <p className="text-base sm:text-xl font-bold text-slate-900 mb-1">
               Tap to Take Photo or Choose Image
             </p>
-            <p className="text-sm sm:text-base text-slate-500">
+            <p className="text-xs sm:text-base text-slate-500">
               Supports JPEG, PNG, WEBP from your phone camera or computer
             </p>
           </div>
@@ -206,10 +206,10 @@ export const PrescriptionUploader: React.FC = () => {
 
       {/* Extraction Results */}
       {scanResult && !isLoading && (
-        <div className="bg-[#FFFFFF] border-2 border-zinc-200 card-contrast rounded-3xl p-6 sm:p-8 shadow-sm">
+        <div className="bg-[#FFFFFF] border-2 border-zinc-200 card-contrast rounded-3xl p-4 sm:p-8 shadow-sm">
           
           {previewImage && (
-            <div className="mb-6 p-4 rounded-2xl bg-zinc-50 border border-zinc-200">
+            <div className="mb-4 sm:mb-6 p-3.5 sm:p-4 rounded-2xl bg-zinc-50 border border-zinc-200">
               <span className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
                 Scanned Document Source:
               </span>
@@ -224,19 +224,19 @@ export const PrescriptionUploader: React.FC = () => {
             </div>
           )}
 
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-zinc-200">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 pb-4 sm:pb-6 border-b border-zinc-200">
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-2xl font-extrabold text-slate-900">
+                <h3 className="text-xl sm:text-2xl font-extrabold text-slate-900">
                   Extracted Medications
                 </h3>
                 {scanResult.isDemo && (
-                  <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 border border-amber-300">
+                  <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300">
                     Demo Mode
                   </span>
                 )}
               </div>
-              <p className="text-sm sm:text-base text-slate-600 mt-1">
+              <p className="text-xs sm:text-base text-slate-600 mt-0.5 sm:mt-1">
                 {scanResult.clinicName || 'Clinic Prescription'} • {scanResult.doctorName || 'Attending Physician'}
               </p>
             </div>
@@ -244,7 +244,7 @@ export const PrescriptionUploader: React.FC = () => {
             {/* Add to Schedule Action Button */}
             <button
               onClick={handleAddToSchedule}
-              className="min-h-tap px-6 py-3 bg-sage-600 hover:bg-sage-700 text-white rounded-xl font-bold text-lg flex items-center justify-center gap-2 shadow-sm transition-all"
+              className="min-h-tap w-full sm:w-auto px-5 sm:px-6 py-3 bg-sage-600 hover:bg-sage-700 text-white rounded-xl font-bold text-base sm:text-lg flex items-center justify-center gap-2 shadow-sm transition-all active:scale-[0.99]"
             >
               <Plus className="w-5 h-5 stroke-[2.5]" />
               <span>Add Selected to Schedule</span>

@@ -16,10 +16,24 @@ body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  font-size: 1.125rem; /* 18px base for elderly accessibility */
-  line-height: 1.6;
+  font-size: 1rem; /* 16px base for mobile screens */
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+  overflow-x: hidden;
+}
+
+@media (min-width: 640px) {
+  body {
+    font-size: 1.125rem; /* 18px base for larger screens */
+    line-height: 1.6;
+  }
+}
+
+/* Fast tap response on mobile touchscreens */
+button, a, input, select, textarea {
+  touch-action: manipulation;
 }
 
 /* Accessible focus ring for keyboard navigation */

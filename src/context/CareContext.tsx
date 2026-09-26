@@ -19,6 +19,7 @@ import {
   INITIAL_ALERTS,
 } from '@/lib/mockData';
 import { soundEffects, speakText } from '@/lib/audio';
+import { useSession } from 'next-auth/react';
 
 interface CareContextType {
   medications: Medication[];
@@ -30,6 +31,7 @@ interface CareContextType {
   caregiverName: string;
   caregiverPhone: string;
   patientName: string;
+  setPatientName: (name: string) => void;
   isSosActive: boolean;
   nextMedication: Medication | null;
   adherenceRate: number;
@@ -44,6 +46,17 @@ interface CareContextType {
   dismissAlarm: (medId: string) => void;
   testTriggerAlarm: (medId?: string) => void;
   takeMedicineFromAlarm: (medId: string) => void;
+  // Add / Edit Medicine Modal Controls
+  isAddMedicineOpen: boolean;
+  setIsAddMedicineOpen: (open: boolean) => void;
+  openAddMedicine: (med?: Medication | null) => void;
+  closeAddMedicine: () => void;
+  editingMedication: Medication | null;
+  // Onboarding Modal Controls (for new Google / GitHub sign-ins)
+  isOnboardingOpen: boolean;
+  setIsOnboardingOpen: (open: boolean) => void;
+  openOnboarding: () => void;
+  closeOnboarding: () => void;
   // Actions
   setVoiceGender: (gender: VoiceGender) => void;
   markAsTaken: (id: string) => void;
@@ -76,8 +89,15 @@ const STORAGE_KEYS = {
   SETTINGS: 'careecho_settings_v1',
 };
 
+const getUserStorageKey = (key: string, userIdentifier?: string | null) => {
+  if (!userIdentifier) return key;
+  const safe = userIdentifier.replace(/[^a-zA-Z0-9_-]/g, '_');
+  return `${key}_${safe}`;
+};
+
 export const CareProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [medications, setMedications] = useState<Medication[]>(INITIAL_MEDICATIONS);
+  const { data: session } = useSession();
+  const [medications, setMedications] = useState<Medication[]>([]);
   const [adherenceLogs, setAdherenceLogs] = useState<AdherenceLog[]>(INITIAL_LOGS);
   const [voiceLogs, setVoiceLogs] = useState<VoiceCheckIn[]>(INITIAL_VOICE_CHECKINS);
   const [alerts, setAlerts] = useState<CaregiverAlert[]>(INITIAL_ALERTS);
@@ -85,7 +105,7 @@ export const CareProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [highContrast, setHighContrast] = useState<boolean>(false);
   const [caregiverName, setCaregiverName] = useState<string>('Sarah Vance (Daughter)');
   const [caregiverPhone, setCaregiverPhone] = useState<string>('+1 (555) 234-8901');
-  const [patientName] = useState<string>('Margaret Vance');
+  const [patientName, setPatientNameState] = useState<string>('Margaret Vance');
   const [isSosActive, setIsSosActive] = useState<boolean>(false);
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
   // Voice Settings State
@@ -95,6 +115,65 @@ export const CareProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [activeAlarmMedication, setActiveAlarmMedication] = useState<Medication | null>(null);
   const [snoozedMeds, setSnoozedMeds] = useState<Record<string, number>>({});
   const [dismissedMeds, setDismissedMeds] = useState<Record<string, boolean>>({});
+
+  // Add / Edit Medicine Modal State
+  const [isAddMedicineOpen, setIsAddMedicineOpen] = useState<boolean>(false);
+  const [editingMedication, setEditingMedication] = useState<Medication | null>(null);
+
+  const openAddMedicine = (med?: Medication | null) => {
+    setEditingMedication(med || null);
+    setIsAddMedicineOpen(true);
+  };
+
+  const closeAddMedicine = () => {
+    setIsAddMedicineOpen(false);
+    setEditingMedication(null);
+  };
+
+  // Onboarding Modal State
+  const [isOnboardingOpen, setIsOnboardingOpen] = useState<boolean>(false);
+  const openOnboarding = () => setIsOnboardingOpen(true);
+  const closeOnboarding = () => setIsOnboardingOpen(false);
+
+  const userIdentifier = session?.user?.email || (session?.user as any)?.id || null;
+  const isDemoUser =
+    !session ||
+    (session.user as any)?.id === 'demo-senior-user' ||
+    (session.user as any)?.id === 'demo-caregiver-user' ||
+    session.user?.email === 'margaret.vance@careecho.health';
+
+  // Sync patient name with session or localStorage
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('careecho_patient_name');
+      if (saved) {
+        setPatientNameState(saved);
+      }
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    if (session?.user?.name) {
+      const userRole = (session.user as any)?.role;
+      if (userRole === 'caregiver') {
+        setCaregiverName(session.user.name);
+      } else {
+        setPatientNameState(session.user.name);
+        try {
+          localStorage.setItem('careecho_patient_name', session.user.name);
+        } catch {}
+      }
+    }
+  }, [session]);
+
+  const setPatientName = (name: string) => {
+    const trimmed = name.trim();
+    if (!trimmed) return;
+    setPatientNameState(trimmed);
+    try {
+      localStorage.setItem('careecho_patient_name', trimmed);
+    } catch {}
+  };
 
   // Helper to parse time string like "10:00 AM" into minutes from midnight
   const parseTimeToMinutes = (timeStr: string): number | null => {
@@ -162,10 +241,10 @@ export const CareProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Overdue Medicine Checker: Rings alarm when time is over and medicine is not taken
   useEffect(() => {
-    if (!isLoaded) return;
+    if (!isLoaded || !session || medications.length === 0) return;
 
     const checkOverdue = () => {
-      if (activeAlarmMedication) return;
+      if (activeAlarmMedication || !session || medications.length === 0) return;
 
       const now = new Date();
       const currentMinutes = now.getHours() * 60 + now.getMinutes();
@@ -194,24 +273,63 @@ export const CareProvider: React.FC<{ children: React.ReactNode }> = ({ children
     checkOverdue();
     const timer = setInterval(checkOverdue, 10000);
     return () => clearInterval(timer);
-  }, [medications, activeAlarmMedication, snoozedMeds, dismissedMeds, isLoaded, language, voiceGender]);
+  }, [medications, activeAlarmMedication, snoozedMeds, dismissedMeds, isLoaded, session, language, voiceGender]);
 
-  // Load from LocalStorage on mount
+  // Load per-user data when session is established or changed
   useEffect(() => {
+    if (!session) {
+      setMedications([]);
+      return;
+    }
+
     try {
-      const storedMeds = localStorage.getItem(STORAGE_KEYS.MEDS);
-      if (storedMeds) setMedications(JSON.parse(storedMeds));
+      if (!isDemoUser && userIdentifier) {
+        // User logged in via Google or GitHub
+        const safeKey = userIdentifier.replace(/[^a-zA-Z0-9_-]/g, '_');
+        const onboardKey = `careecho_onboarded_${safeKey}`;
+        const hasOnboarded = localStorage.getItem(onboardKey);
 
-      const storedLogs = localStorage.getItem(STORAGE_KEYS.LOGS);
-      if (storedLogs) setAdherenceLogs(JSON.parse(storedLogs));
+        const medKey = getUserStorageKey(STORAGE_KEYS.MEDS, userIdentifier);
+        const storedMeds = localStorage.getItem(medKey);
 
-      const storedVoice = localStorage.getItem(STORAGE_KEYS.VOICE);
-      if (storedVoice) setVoiceLogs(JSON.parse(storedVoice));
+        if (!hasOnboarded) {
+          // BRAND NEW GOOGLE / GITHUB USER:
+          // 1. Give completely empty schedule (ZERO ALARM MEDICINE!)
+          setMedications([]);
+          setAdherenceLogs([]);
+          setAlerts([]);
+          setVoiceLogs([]);
+          // 2. Ask user for setup info first (Senior vs Caregiver & companion name)
+          setIsOnboardingOpen(true);
+          setIsAddMedicineOpen(false);
+        } else if (storedMeds) {
+          setMedications(JSON.parse(storedMeds));
+        } else {
+          setMedications([]);
+        }
 
-      const storedAlerts = localStorage.getItem(STORAGE_KEYS.ALERTS);
-      if (storedAlerts) setAlerts(JSON.parse(storedAlerts));
+        const storedLogs = localStorage.getItem(getUserStorageKey(STORAGE_KEYS.LOGS, userIdentifier));
+        if (storedLogs) setAdherenceLogs(JSON.parse(storedLogs));
 
-      const storedSettings = localStorage.getItem(STORAGE_KEYS.SETTINGS);
+        const storedAlerts = localStorage.getItem(getUserStorageKey(STORAGE_KEYS.ALERTS, userIdentifier));
+        if (storedAlerts) setAlerts(JSON.parse(storedAlerts));
+      } else {
+        // Demo Margaret / Sarah: load demo data
+        const storedMeds = localStorage.getItem(STORAGE_KEYS.MEDS);
+        if (storedMeds) {
+          setMedications(JSON.parse(storedMeds));
+        } else {
+          setMedications(INITIAL_MEDICATIONS);
+        }
+        const storedLogs = localStorage.getItem(STORAGE_KEYS.LOGS);
+        if (storedLogs) setAdherenceLogs(JSON.parse(storedLogs));
+        const storedAlerts = localStorage.getItem(STORAGE_KEYS.ALERTS);
+        if (storedAlerts) setAlerts(JSON.parse(storedAlerts));
+      }
+
+      // Settings
+      const settingsKey = getUserStorageKey(STORAGE_KEYS.SETTINGS, userIdentifier);
+      const storedSettings = localStorage.getItem(settingsKey) || localStorage.getItem(STORAGE_KEYS.SETTINGS);
       if (storedSettings) {
         const parsed = JSON.parse(storedSettings);
         if (parsed.language) setLanguageState(parsed.language);
@@ -226,22 +344,41 @@ export const CareProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (parsed.voiceGender) setVoiceGender(parsed.voiceGender);
       }
     } catch (e) {
-      console.error('Failed to load CareEcho persistence:', e);
+      console.error('Failed to load user-scoped CareEcho data:', e);
     } finally {
       setIsLoaded(true);
     }
-  }, []);
+  }, [session, userIdentifier, isDemoUser]);
 
   // Save to LocalStorage whenever state changes
   useEffect(() => {
-    if (!isLoaded) return;
+    if (!isLoaded || !session) return;
     try {
-      localStorage.setItem(STORAGE_KEYS.MEDS, JSON.stringify(medications));
-      localStorage.setItem(STORAGE_KEYS.LOGS, JSON.stringify(adherenceLogs));
-      localStorage.setItem(STORAGE_KEYS.VOICE, JSON.stringify(voiceLogs));
-      localStorage.setItem(STORAGE_KEYS.ALERTS, JSON.stringify(alerts));
+      const medKey = !isDemoUser && userIdentifier
+        ? getUserStorageKey(STORAGE_KEYS.MEDS, userIdentifier)
+        : STORAGE_KEYS.MEDS;
+      localStorage.setItem(medKey, JSON.stringify(medications));
+
+      const logsKey = !isDemoUser && userIdentifier
+        ? getUserStorageKey(STORAGE_KEYS.LOGS, userIdentifier)
+        : STORAGE_KEYS.LOGS;
+      localStorage.setItem(logsKey, JSON.stringify(adherenceLogs));
+
+      const voiceKey = !isDemoUser && userIdentifier
+        ? getUserStorageKey(STORAGE_KEYS.VOICE, userIdentifier)
+        : STORAGE_KEYS.VOICE;
+      localStorage.setItem(voiceKey, JSON.stringify(voiceLogs));
+
+      const alertsKey = !isDemoUser && userIdentifier
+        ? getUserStorageKey(STORAGE_KEYS.ALERTS, userIdentifier)
+        : STORAGE_KEYS.ALERTS;
+      localStorage.setItem(alertsKey, JSON.stringify(alerts));
+
+      const settingsKey = !isDemoUser && userIdentifier
+        ? getUserStorageKey(STORAGE_KEYS.SETTINGS, userIdentifier)
+        : STORAGE_KEYS.SETTINGS;
       localStorage.setItem(
-        STORAGE_KEYS.SETTINGS,
+        settingsKey,
         JSON.stringify({
           language,
           highContrast,
@@ -264,6 +401,9 @@ export const CareProvider: React.FC<{ children: React.ReactNode }> = ({ children
     caregiverPhone,
     voiceGender,
     isLoaded,
+    session,
+    userIdentifier,
+    isDemoUser,
   ]);
 
   // Handle High Contrast Class on HTML element
@@ -358,11 +498,26 @@ export const CareProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Add medication
   const addMedication = (med: Omit<Medication, 'id'>) => {
-    soundEffects.playTap();
+    soundEffects.playSuccessChime();
+    try {
+      confetti({
+        particleCount: 50,
+        spread: 60,
+        origin: { y: 0.6 },
+      });
+    } catch {}
+
     const newMed: Medication = {
       ...med,
       id: `med-${Date.now()}`,
     };
+
+    // Ensure newly added medicine doesn't trigger an immediate overdue alarm today
+    setDismissedMeds((prev) => ({
+      ...prev,
+      [newMed.id]: true,
+    }));
+
     setMedications((prev) => [...prev, newMed]);
   };
 
@@ -576,6 +731,7 @@ export const CareProvider: React.FC<{ children: React.ReactNode }> = ({ children
         caregiverName,
         caregiverPhone,
         patientName,
+        setPatientName,
         isSosActive,
         nextMedication,
         adherenceRate,
@@ -589,6 +745,15 @@ export const CareProvider: React.FC<{ children: React.ReactNode }> = ({ children
         dismissAlarm,
         testTriggerAlarm,
         takeMedicineFromAlarm,
+        isAddMedicineOpen,
+        setIsAddMedicineOpen,
+        openAddMedicine,
+        closeAddMedicine,
+        editingMedication,
+        isOnboardingOpen,
+        setIsOnboardingOpen,
+        openOnboarding,
+        closeOnboarding,
         markAsTaken,
         markAsPending,
         addMedication,

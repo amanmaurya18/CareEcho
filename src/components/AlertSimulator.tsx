@@ -69,16 +69,16 @@ export const AlertSimulator: React.FC = () => {
   };
 
   return (
-    <div className="bg-[#FFFFFF] border-2 border-zinc-200 card-contrast rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+    <div className="bg-[#FFFFFF] border-2 border-zinc-200 card-contrast rounded-3xl p-4 sm:p-8 shadow-sm space-y-5 sm:space-y-6">
       
       {/* Section Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-zinc-200">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 pb-3 sm:pb-4 border-b border-zinc-200">
         <div>
-          <h3 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-            <Smartphone className="w-6 h-6 text-sage-600" />
-            Caregiver Alert & Notification Simulator
+          <h3 className="text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-2">
+            <Smartphone className="w-5 h-5 sm:w-6 sm:h-6 text-sage-600 shrink-0" />
+            <span>Caregiver Alert & Simulator</span>
           </h3>
-          <p className="text-sm sm:text-base text-slate-600 mt-1">
+          <p className="text-xs sm:text-base text-slate-600 mt-0.5 sm:mt-1">
             Simulate real-time WhatsApp & SMS notifications sent to family members when doses are taken or missed.
           </p>
         </div>
@@ -87,10 +87,10 @@ export const AlertSimulator: React.FC = () => {
       {/* Config Form */}
       <form
         onSubmit={handleSaveContact}
-        className="bg-zinc-50 border border-zinc-200 rounded-2xl p-4 sm:p-5"
+        className="bg-zinc-50 border border-zinc-200 rounded-2xl p-3.5 sm:p-5"
       >
-        <div className="flex items-center gap-2 text-slate-800 font-bold text-base mb-3">
-          <Settings className="w-5 h-5 text-slate-600" />
+        <div className="flex items-center gap-2 text-slate-800 font-bold text-sm sm:text-base mb-2.5 sm:mb-3">
+          <Settings className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600" />
           <span>Configured Caregiver Contact:</span>
         </div>
 

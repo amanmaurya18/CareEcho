@@ -64,7 +64,18 @@ export interface PrescriptionScanResult {
   isDemo?: boolean;
 }
 
-export type SupportedLanguage = 'en-US' | 'hi-IN' | 'es-ES';
+export type SupportedLanguage =
+  | 'en-US'
+  | 'hi-IN'
+  | 'ta-IN'
+  | 'te-IN'
+  | 'bn-IN'
+  | 'mr-IN'
+  | 'gu-IN'
+  | 'kn-IN'
+  | 'ml-IN'
+  | 'pa-IN'
+  | 'es-ES';
 
 export type VoiceGender = 'female' | 'male';
 

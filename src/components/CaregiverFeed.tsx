@@ -39,64 +39,64 @@ export const CaregiverFeed: React.FC = () => {
     <div className="space-y-6">
       
       {/* Adherence Scorecard */}
-      <div className="bg-[#FFFFFF] border-2 border-zinc-200 card-contrast rounded-3xl p-6 sm:p-8 shadow-sm">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+      <div className="bg-[#FFFFFF] border-2 border-zinc-200 card-contrast rounded-3xl p-4 sm:p-8 shadow-sm">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5 sm:gap-6">
           
           {/* Adherence Percentage Circle */}
-          <div className="flex items-center gap-5">
-            <div className="relative w-24 h-24 sm:w-28 sm:h-28 flex items-center justify-center rounded-full bg-sage-50 border-4 border-sage-500 shadow-inner shrink-0">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3.5 sm:gap-5">
+            <div className="relative w-20 h-20 sm:w-28 sm:h-28 flex items-center justify-center rounded-full bg-sage-50 border-4 border-sage-500 shadow-inner shrink-0">
               <div className="text-center">
-                <span className="text-2xl sm:text-3xl font-extrabold text-sage-800">
+                <span className="text-xl sm:text-3xl font-extrabold text-sage-800">
                   {adherenceRate}%
                 </span>
-                <span className="block text-[11px] font-bold uppercase text-sage-700 tracking-wider">
+                <span className="block text-[10px] sm:text-[11px] font-bold uppercase text-sage-700 tracking-wider">
                   Adherence
                 </span>
               </div>
             </div>
 
             <div>
-              <div className="flex items-center gap-2 mb-1">
-                <Award className="w-5 h-5 text-amber-pending" />
-                <span className="text-sm font-bold text-amber-pending uppercase tracking-wider">
+              <div className="flex items-center gap-1.5 sm:gap-2 mb-1">
+                <Award className="w-4 h-4 sm:w-5 sm:h-5 text-amber-pending" />
+                <span className="text-xs sm:text-sm font-bold text-amber-pending uppercase tracking-wider">
                   {streakDays}-Day Perfect Streak
                 </span>
               </div>
-              <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
+              <h2 className="text-lg sm:text-2xl font-bold text-slate-900">
                 {patientName}&apos;s Health Scorecard
               </h2>
-              <p className="text-sm sm:text-base text-slate-600 mt-1">
+              <p className="text-xs sm:text-base text-slate-600 mt-0.5 sm:mt-1">
                 Based on medication logging and daily voice check-ins over the past 7 days.
               </p>
             </div>
           </div>
 
           {/* Quick Metrics Grid & Print Action */}
-          <div className="flex flex-col items-end gap-3 w-full md:w-auto">
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 w-full md:w-auto">
-              <div className="p-3.5 rounded-2xl bg-sage-50 border border-sage-200 text-center">
-                <span className="block text-2xl font-extrabold text-sage-700">
+          <div className="flex flex-col sm:items-end gap-3 w-full md:w-auto">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-3 w-full md:w-auto">
+              <div className="p-3 sm:p-3.5 rounded-2xl bg-sage-50 border border-sage-200 text-center">
+                <span className="block text-xl sm:text-2xl font-extrabold text-sage-700">
                   {takenCount}
                 </span>
-                <span className="text-xs font-bold text-slate-600 uppercase">
+                <span className="text-[11px] sm:text-xs font-bold text-slate-600 uppercase">
                   Doses Taken
                 </span>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-amber-pendingBg border border-amber-pendingBorder text-center">
-                <span className="block text-2xl font-extrabold text-amber-pending">
+              <div className="p-3 sm:p-3.5 rounded-2xl bg-amber-pendingBg border border-amber-pendingBorder text-center">
+                <span className="block text-xl sm:text-2xl font-extrabold text-amber-pending">
                   {pendingCount}
                 </span>
-                <span className="text-xs font-bold text-slate-600 uppercase">
+                <span className="text-[11px] sm:text-xs font-bold text-slate-600 uppercase">
                   Pending Today
                 </span>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-zinc-100 border border-zinc-200 text-center col-span-2 sm:col-span-1">
-                <span className="block text-2xl font-extrabold text-slate-800">
+              <div className="p-3 sm:p-3.5 rounded-2xl bg-zinc-100 border border-zinc-200 text-center col-span-2 sm:col-span-1">
+                <span className="block text-xl sm:text-2xl font-extrabold text-slate-800">
                   {voiceLogs.length}
                 </span>
-                <span className="text-xs font-bold text-slate-600 uppercase">
+                <span className="text-[11px] sm:text-xs font-bold text-slate-600 uppercase">
                   Voice Check-ins
                 </span>
               </div>
@@ -104,7 +104,7 @@ export const CaregiverFeed: React.FC = () => {
 
             <button
               onClick={handlePrintSchedule}
-              className="min-h-tap px-4 py-2 border border-zinc-300 hover:bg-zinc-100 text-slate-700 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors"
+              className="min-h-tap w-full sm:w-auto px-4 py-2 border border-zinc-300 hover:bg-zinc-100 text-slate-700 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-colors"
               title="Print or Save Schedule PDF"
             >
               <Printer className="w-4 h-4 text-slate-600" />
@@ -116,24 +116,24 @@ export const CaregiverFeed: React.FC = () => {
       </div>
 
       {/* Real-Time Live Feed */}
-      <div className="bg-[#FFFFFF] border-2 border-zinc-200 card-contrast rounded-3xl p-6 sm:p-8 shadow-sm">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-zinc-200">
-          <div className="flex items-center gap-2.5">
-            <Activity className="w-6 h-6 text-sage-600" />
-            <h3 className="text-2xl font-bold text-slate-900">
+      <div className="bg-[#FFFFFF] border-2 border-zinc-200 card-contrast rounded-3xl p-4 sm:p-8 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 mb-4 sm:mb-6 pb-3 sm:pb-4 border-b border-zinc-200">
+          <div className="flex items-center gap-2 sm:gap-2.5">
+            <Activity className="w-5 h-5 sm:w-6 sm:h-6 text-sage-600" />
+            <h3 className="text-xl sm:text-2xl font-bold text-slate-900">
               Real-Time Activity Feed
             </h3>
           </div>
-          <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 animate-pulse self-start sm:self-auto">
+          <span className="text-[10px] sm:text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 animate-pulse self-start sm:self-auto">
             Live Stream
           </span>
         </div>
 
         {/* Filter Tabs */}
-        <div className="flex flex-wrap items-center gap-2 mb-6">
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-4 sm:mb-6">
           <button
             onClick={() => setActiveFilter('all')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+            className={`px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
               activeFilter === 'all'
                 ? 'bg-slate-900 text-white shadow-xs'
                 : 'bg-zinc-100 hover:bg-zinc-200 text-slate-700'

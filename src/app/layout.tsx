@@ -2,6 +2,10 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { CareProvider } from '@/context/CareContext';
 import { MedicationAlarmModal } from '@/components/MedicationAlarmModal';
+import AuthProvider from '@/components/AuthProvider';
+import { AuthGate } from '@/components/AuthGate';
+import { AddMedicineModal } from '@/components/AddMedicineModal';
+import { NewUserOnboardingModal } from '@/components/NewUserOnboardingModal';
 
 export const metadata: Metadata = {
   title: 'CareEcho — Real-Time Multimodal Health Companion',
@@ -32,10 +36,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen bg-[#FBFBFA] text-slate-900 selection:bg-sage-200 selection:text-sage-900 antialiased overflow-x-hidden">
-        <CareProvider>
-          {children}
-          <MedicationAlarmModal />
-        </CareProvider>
+        <AuthProvider>
+          <CareProvider>
+            <AuthGate>
+              {children}
+              <MedicationAlarmModal />
+              <AddMedicineModal />
+              <NewUserOnboardingModal />
+            </AuthGate>
+          </CareProvider>
+        </AuthProvider>
       </body>
     </html>
   );

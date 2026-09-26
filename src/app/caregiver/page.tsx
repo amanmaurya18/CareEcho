@@ -24,21 +24,21 @@ export default function CaregiverPortalPage() {
       <Navigation />
 
       {/* Main Caregiver Content Area */}
-      <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
-        
+      <main className="flex-1 max-w-5xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-5 sm:space-y-8">
+
         {/* Welcome Caregiver Header */}
-        <div className="bg-[#FFFFFF] border-2 border-zinc-200 card-contrast rounded-3xl p-6 sm:p-8 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-3.5">
-            <div className="w-14 h-14 rounded-2xl bg-sage-100 border border-sage-200 flex items-center justify-center text-sage-700 shrink-0">
-              <ShieldCheck className="w-8 h-8" />
+        <div className="bg-[#FFFFFF] border-2 border-zinc-200 card-contrast rounded-3xl p-4 sm:p-8 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+          <div className="flex items-center gap-3 sm:gap-3.5">
+            <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-2xl bg-sage-100 border border-sage-200 flex items-center justify-center text-sage-700 shrink-0">
+              <ShieldCheck className="w-6 h-6 sm:w-8 sm:h-8" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
+                <h1 className="text-xl sm:text-3xl font-extrabold text-slate-900">
                   Caregiver Monitoring Portal
                 </h1>
               </div>
-              <p className="text-sm sm:text-base text-slate-600 font-medium mt-0.5">
+              <p className="text-xs sm:text-base text-slate-600 font-medium mt-0.5">
                 Monitoring <span className="font-bold text-slate-900">{patientName}</span> • Logged in as <span className="font-bold text-slate-900">{caregiverName}</span>
               </p>
             </div>

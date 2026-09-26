@@ -21,6 +21,7 @@ export const MedicineManagerModal: React.FC = () => {
     updateMedication,
     deleteMedication,
     resetToDefaults,
+    openAddMedicine,
   } = useCare();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -97,35 +98,35 @@ export const MedicineManagerModal: React.FC = () => {
   };
 
   return (
-    <div className="bg-[#FFFFFF] border-2 border-zinc-200 card-contrast rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+    <div className="bg-[#FFFFFF] border-2 border-zinc-200 card-contrast rounded-3xl p-4 sm:p-8 shadow-sm space-y-4 sm:space-y-6">
       
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-200">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 pb-3 sm:pb-4 border-b border-zinc-200">
         <div>
-          <h3 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-            <Pill className="w-6 h-6 text-sage-600" />
-            Recurring Medication Manager
+          <h3 className="text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-2">
+            <Pill className="w-5 h-5 sm:w-6 sm:h-6 text-sage-600 shrink-0" />
+            <span>Recurring Medication Manager</span>
           </h3>
-          <p className="text-sm sm:text-base text-slate-600 mt-1">
+          <p className="text-xs sm:text-base text-slate-600 mt-0.5 sm:mt-1">
             Maintain the elder&apos;s daily medication regimen. Add new doctor prescriptions or remove outdated pills.
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 w-full sm:w-auto">
           <button
             onClick={resetToDefaults}
             title="Reset sample data to initial state"
-            className="min-h-tap px-3.5 py-2 border border-zinc-300 rounded-xl text-xs font-semibold text-slate-600 hover:bg-zinc-100 flex items-center gap-1.5"
+            className="flex-1 sm:flex-initial min-h-tap px-3 py-2 border border-zinc-300 rounded-xl text-xs font-semibold text-slate-600 hover:bg-zinc-100 flex items-center justify-center gap-1.5 transition-colors"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span>Reset Demo</span>
           </button>
 
           <button
-            onClick={openNewForm}
-            className="min-h-tap px-4 py-2.5 bg-sage-600 hover:bg-sage-700 text-white rounded-xl font-bold text-base flex items-center gap-2 shadow-sm"
+            onClick={() => openAddMedicine()}
+            className="flex-1 sm:flex-initial min-h-tap px-3.5 sm:px-4 py-2 bg-sage-600 hover:bg-sage-700 text-white rounded-xl font-bold text-xs sm:text-base flex items-center justify-center gap-1.5 sm:gap-2 shadow-sm transition-all active:scale-[0.99]"
           >
-            <Plus className="w-5 h-5 stroke-[2.5]" />
+            <Plus className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2.5]" />
             <span>Add Medication</span>
           </button>
         </div>
@@ -167,7 +168,7 @@ export const MedicineManagerModal: React.FC = () => {
                 <td className="py-3.5 px-4 text-right">
                   <div className="flex items-center justify-end gap-2">
                     <button
-                      onClick={() => openEditForm(med)}
+                      onClick={() => openAddMedicine(med)}
                       aria-label={`Edit ${med.name}`}
                       className="p-2 text-slate-600 hover:text-slate-900 hover:bg-zinc-200 rounded-lg min-h-tap min-w-tap flex items-center justify-center"
                     >
@@ -191,17 +192,17 @@ export const MedicineManagerModal: React.FC = () => {
       {/* Add / Edit Medication Modal */}
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
-          <div className="w-full max-w-lg bg-[#FFFFFF] border-2 border-zinc-300 card-contrast rounded-3xl p-5 sm:p-8 shadow-2xl relative max-h-[92vh] overflow-y-auto">
+          <div className="w-full max-w-lg bg-[#FFFFFF] border-2 border-zinc-300 card-contrast rounded-3xl p-4 sm:p-8 shadow-2xl relative max-h-[90dvh] overflow-y-auto">
             
             <button
               onClick={() => setIsOpen(false)}
               aria-label="Close dialog"
-              className="absolute top-5 right-5 p-2 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-zinc-100 min-h-tap min-w-tap flex items-center justify-center"
+              className="absolute top-3.5 right-3.5 sm:top-5 sm:right-5 p-2 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-zinc-100 min-h-tap min-w-tap flex items-center justify-center z-10"
             >
-              <X className="w-6 h-6" />
+              <X className="w-5 h-5 sm:w-6 sm:h-6" />
             </button>
 
-            <h3 className="text-2xl font-bold text-slate-900 mb-4">
+            <h3 className="text-xl sm:text-2xl font-bold text-slate-900 mb-3 sm:mb-4">
               {editingMed ? 'Edit Medication' : 'Add New Medication'}
             </h3>
 

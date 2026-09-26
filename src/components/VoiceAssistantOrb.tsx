@@ -163,6 +163,30 @@ export const VoiceAssistantOrb: React.FC = () => {
     }
   };
 
+  const greetUserByName = async () => {
+    const firstName = patientName.split(' ')[0] || patientName;
+    const greetings: Record<string, string> = {
+      'hi-IN': `नमस्ते ${firstName}! आप लॉग इन हैं और मैं आपकी दवाइयों के शेड्यूल के साथ तैयार हूँ। आज आप कैसा महसूस कर रहे हैं?`,
+      'ta-IN': `வணக்கம் ${firstName}! நீங்கள் உள்நுழைந்துள்ளீர்கள், உங்கள் மருந்து அட்டவணை தயாராக உள்ளது. இன்று நீங்கள் எப்படி உணர்கிறீர்கள்?`,
+      'te-IN': `నమస్కారం ${firstName}! మీరు లాగిన్ అయ్యారు, మీ మందుల షెడ్యూల్ సిద్ధంగా ఉంది. ఈరోజు మీరు ఎలా ఉన్నారు?`,
+      'bn-IN': `নমস্কার ${firstName}! আপনি লগইন করেছেন এবং আমি আপনার ওষুধের সময়সূচি নিয়ে প্রস্তুত। আজ আপনার কেমন লাগছে?`,
+      'mr-IN': `नमस्कार ${firstName}! तुम्ही लॉग इन आहात आणि मी तुमच्या औषधांच्या वेळापत्रकासह तयार आहे. आज तुम्हाला कसे वाटत आहे?`,
+      'gu-IN': `નમસ્તે ${firstName}! તમે લોગ ઇન છો અને હું તમારી દવાઓના સમયપત્રક સાથે તૈયાર છું. આજે તમે કેવું અનુભવો છો?`,
+      'kn-IN': `ನಮಸ್ಕಾರ ${firstName}! ನೀವು ಲಾಗಿನ್ ಆಗಿದ್ದೀರಿ ಮತ್ತು ನಿಮ್ಮ ಔಷಧಿ ವೇಳಾಪಟ್ಟಿ ಸಿದ್ಧವಾಗಿದೆ. ಇಂದು ನಿಮಗೆ ಹೇಗನಿಸುತ್ತಿದೆ?`,
+      'ml-IN': `നമസ്കാരം ${firstName}! നിങ്ങൾ ലോഗിൻ ചെയ്തിരിക്കുന്നു, നിങ്ങളുടെ മരുന്ന് ഷെഡ്യൂൾ തയ്യാറാണ്. இன்று உங்களுக்கு சுகമാണോ?`,
+      'pa-IN': `ਸਤਿ ਸ਼੍ਰੀ ਅਕਾਲ ${firstName}! ਤੁਸੀਂ ਲੌਗਇਨ ਹੋ ਅਤੇ ਮੈਂ ਤੁਹਾਡੀ ਦਵਾਈਆਂ ਦੀ ਸਮਾਂ-ਸਾਰਣੀ ਨਾਲ ਤਿਆਰ ਹਾਂ। ਅੱਜ ਤੁਸੀਂ ਕਿਵੇਂ ਮਹਿਸੂਸ ਕਰ ਰਹੇ ਹੋ?`,
+      'es-ES': `¡Hola ${firstName}! Su horario de medicamentos está listo. ¿Cómo se siente hoy?`,
+      'en-US': `Hello ${firstName}! You are logged in, and I am right here with your daily medication schedule. How can I help you today?`,
+    };
+
+    const greeting = greetings[language] || greetings['en-US'];
+    setResponseText(greeting);
+    addVoiceCheckIn('Check-in Greeting', greeting, 'good');
+    setIsSpeaking(true);
+    await speakText(greeting, language, voiceGender);
+    setIsSpeaking(false);
+  };
+
   const handleManualSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!textInput.trim()) return;
@@ -174,19 +198,19 @@ export const VoiceAssistantOrb: React.FC = () => {
 
   return (
     <>
-      {/* Floating Voice Orb in Bottom-Right Corner */}
-      <div className="fixed bottom-6 right-6 z-40 flex flex-col items-end">
+      {/* Floating Voice Orb in Bottom-Right Corner with safe-area spacing */}
+      <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40 flex flex-col items-end">
         {/* Pulsing Voice Orb Button */}
         <button
           onClick={handleOrbClick}
           aria-label="Activate CareEcho Voice Assistant"
-          className="relative group p-4 sm:p-5 rounded-full bg-sage-600 hover:bg-sage-700 text-white shadow-xl hover:shadow-2xl transition-all transform hover:scale-105 active:scale-95 flex items-center justify-center border-4 border-white card-contrast"
+          className="relative group p-3.5 sm:p-5 rounded-full bg-sage-600 hover:bg-sage-700 text-white shadow-xl hover:shadow-2xl transition-all transform hover:scale-105 active:scale-95 flex items-center justify-center border-4 border-white card-contrast"
         >
           {/* Ambient pulse ring */}
           <span className="absolute -inset-2 rounded-full bg-sage-500/30 animate-ping pointer-events-none opacity-60"></span>
 
           <div className="relative flex items-center gap-2">
-            <Mic className="w-7 h-7 sm:w-8 sm:h-8" />
+            <Mic className="w-6 h-6 sm:w-8 sm:h-8" />
             <span className="hidden sm:inline font-bold text-base pr-1">Tap to Talk</span>
           </div>
         </button>
@@ -194,8 +218,8 @@ export const VoiceAssistantOrb: React.FC = () => {
 
       {/* Voice Assistant Modal Dialogue */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
-          <div className="w-full max-w-lg bg-[#FFFFFF] border-2 border-zinc-300 card-contrast rounded-3xl p-5 sm:p-8 shadow-2xl relative max-h-[92vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
+          <div className="w-full max-w-lg bg-[#FFFFFF] border-2 border-zinc-300 card-contrast rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-2xl relative max-h-[90dvh] overflow-y-auto">
             
             {/* Close button */}
             <button
@@ -208,22 +232,45 @@ export const VoiceAssistantOrb: React.FC = () => {
                 setIsOpen(false);
               }}
               aria-label="Close voice assistant dialog"
-              className="absolute top-5 right-5 p-2 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-zinc-100 min-h-tap min-w-tap flex items-center justify-center"
+              className="absolute top-3.5 right-3.5 sm:top-5 sm:right-5 p-2 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-zinc-100 min-h-tap min-w-tap flex items-center justify-center"
             >
-              <X className="w-6 h-6" />
+              <X className="w-5 h-5 sm:w-6 sm:h-6" />
             </button>
 
             {/* Header */}
-            <div className="flex items-center justify-between gap-3 mb-6 pr-8">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-sage-100 flex items-center justify-center text-sage-700 shrink-0">
-                  <Sparkles className="w-6 h-6" />
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 mb-4 sm:mb-6 pr-10 sm:pr-8">
+              <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-sage-100 flex items-center justify-center text-sage-700 shrink-0">
+                  <Sparkles className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-slate-900">CareEcho Voice Companion</h3>
-                  <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                <div className="text-left min-w-0">
+                  <h3 className="text-lg sm:text-2xl font-bold text-slate-900 truncate">CareEcho Voice Companion</h3>
+                  <div className="flex items-center gap-1.5 mt-0.5 sm:mt-1 flex-wrap">
+                    <span className="inline-flex items-center gap-1 text-[11px] sm:text-xs font-semibold px-2 py-0.5 rounded-full bg-sage-50 text-sage-800 border border-sage-200">
+                      For <strong className="font-bold">{patientName.split(' ')[0]}</strong>
+                    </span>
                     <span className="text-xs font-semibold text-slate-600">
-                      Listening in {language === 'en-US' ? 'English' : language === 'hi-IN' ? 'Hindi' : 'Spanish'}
+                      {language === 'hi-IN'
+                        ? 'हिंदी (Hindi)'
+                        : language === 'ta-IN'
+                        ? 'தமிழ் (Tamil)'
+                        : language === 'te-IN'
+                        ? 'తెలుగు (Telugu)'
+                        : language === 'bn-IN'
+                        ? 'বাংলা (Bengali)'
+                        : language === 'mr-IN'
+                        ? 'मराठी (Marathi)'
+                        : language === 'gu-IN'
+                        ? 'ગુજરાતી (Gujarati)'
+                        : language === 'kn-IN'
+                        ? 'ಕನ್ನಡ (Kannada)'
+                        : language === 'ml-IN'
+                        ? 'മലയാളം (Malayalam)'
+                        : language === 'pa-IN'
+                        ? 'ਪੰਜਾਬੀ (Punjabi)'
+                        : language === 'es-ES'
+                        ? 'Español'
+                        : 'English'}
                     </span>
                     <span className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200">
                       <span>🌸</span> Female Voice
@@ -232,16 +279,18 @@ export const VoiceAssistantOrb: React.FC = () => {
                 </div>
               </div>
 
-              {/* Instant Test Voice Button */}
-              <button
-                type="button"
-                onClick={() => testFemaleVoice(language)}
-                aria-label="Test female voice sample"
-                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold rounded-xl border border-rose-200 transition-all shrink-0"
-              >
-                <Volume2 className="w-3.5 h-3.5" />
-                <span>Test Voice</span>
-              </button>
+              {/* Action Buttons: Greet & Test Voice */}
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={greetUserByName}
+                  aria-label="Greet user by name"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-sage-50 hover:bg-sage-100 text-sage-800 text-xs font-bold rounded-xl border border-sage-200 transition-all shrink-0 active:scale-95 shadow-xs"
+                >
+                  <Volume2 className="w-3.5 h-3.5 text-sage-600" />
+                  <span>Greet {patientName.split(' ')[0]}</span>
+                </button>
+              </div>
             </div>
 
             {/* Large Interactive Pulsing Orb Display */}

@@ -35,47 +35,47 @@ export const MedicationAlarmModal: React.FC = () => {
       aria-labelledby="alarm-title"
       className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-red-950/80 backdrop-blur-md animate-fadeIn"
     >
-      <div className="w-full max-w-lg bg-[#FFFFFF] border-4 border-red-500 rounded-3xl p-6 sm:p-8 shadow-2xl relative text-center max-h-[92vh] overflow-y-auto animate-scaleUp">
+      <div className="w-full max-w-lg bg-[#FFFFFF] border-4 border-red-500 rounded-3xl p-4 sm:p-8 shadow-2xl relative text-center max-h-[90dvh] overflow-y-auto animate-scaleUp">
         
         {/* Animated Pulsing Alarm Bell */}
-        <div className="relative w-24 h-24 mx-auto mb-4 flex items-center justify-center">
+        <div className="relative w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-3 sm:mb-4 flex items-center justify-center">
           <span className="absolute inset-0 rounded-full bg-red-400/40 animate-ping" />
-          <span className="absolute inset-2 rounded-full bg-red-200/60 animate-pulse" />
-          <div className="relative w-20 h-20 rounded-full bg-red-600 text-white flex items-center justify-center shadow-lg">
-            <Bell className="w-10 h-10 animate-bounce" />
+          <span className="absolute inset-1.5 rounded-full bg-red-200/60 animate-pulse" />
+          <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-red-600 text-white flex items-center justify-center shadow-lg">
+            <Bell className="w-7 h-7 sm:w-8 sm:h-8 animate-bounce" />
           </div>
         </div>
 
         {/* Alarm Banner & Title */}
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-100 text-red-800 text-xs font-bold uppercase tracking-wider mb-2 border border-red-300">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-100 text-red-800 text-[11px] sm:text-xs font-bold uppercase tracking-wider mb-2 border border-red-300">
           <AlertTriangle className="w-3.5 h-3.5" />
           <span>Medication Alarm Ringing</span>
         </div>
 
-        <h2 id="alarm-title" className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-1">
+        <h2 id="alarm-title" className="text-xl sm:text-3xl font-extrabold text-slate-900 mb-1 leading-tight">
           Time is Over: Take Your Medicine!
         </h2>
 
-        <p className="text-sm sm:text-base text-slate-600 mb-5">
+        <p className="text-xs sm:text-base text-slate-600 mb-4 sm:mb-5">
           {patientName.split(' ')[0]}, your scheduled dose has passed and is not yet marked as taken.
         </p>
 
         {/* Medicine Details Card */}
-        <div className="bg-amber-50/70 border-2 border-amber-300 rounded-2xl p-5 mb-6 text-left">
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-amber-100 border border-amber-200 flex items-center justify-center text-amber-800 shrink-0">
-                <Pill className="w-6 h-6" />
+        <div className="bg-amber-50/70 border-2 border-amber-300 rounded-2xl p-3.5 sm:p-5 mb-4 sm:mb-6 text-left">
+          <div className="flex items-start justify-between gap-2.5 sm:gap-3">
+            <div className="flex items-center gap-2.5 sm:gap-3">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-amber-100 border border-amber-200 flex items-center justify-center text-amber-800 shrink-0">
+                <Pill className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
               <div>
-                <h3 className="text-xl sm:text-2xl font-extrabold text-slate-900">
+                <h3 className="text-base sm:text-2xl font-extrabold text-slate-900 leading-tight">
                   {activeAlarmMedication.name}{' '}
-                  <span className="text-amber-800 font-bold text-lg">
+                  <span className="text-amber-800 font-bold text-sm sm:text-lg">
                     {activeAlarmMedication.dosage}
                   </span>
                 </h3>
-                <div className="flex items-center gap-2 text-xs font-semibold text-slate-600 mt-0.5">
-                  <Clock className="w-3.5 h-3.5 text-amber-700" />
+                <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-semibold text-slate-600 mt-0.5">
+                  <Clock className="w-3.5 h-3.5 text-amber-700 shrink-0" />
                   <span>Scheduled for {activeAlarmMedication.scheduledTime} ({activeAlarmMedication.timeOfDay})</span>
                 </div>
               </div>
@@ -85,44 +85,44 @@ export const MedicationAlarmModal: React.FC = () => {
             <button
               onClick={handleReadAloud}
               title="Read alarm instructions aloud"
-              className="p-2.5 rounded-xl border border-amber-300 bg-white hover:bg-amber-100 text-amber-800 shrink-0 min-h-tap min-w-tap flex items-center justify-center"
+              className="p-2 sm:p-2.5 rounded-xl border border-amber-300 bg-white hover:bg-amber-100 text-amber-800 shrink-0 min-h-tap min-w-tap flex items-center justify-center"
             >
               <Volume2 className="w-5 h-5" />
             </button>
           </div>
 
-          <div className="mt-3 pt-3 border-t border-amber-200/80 text-sm text-slate-700 font-medium">
+          <div className="mt-2.5 pt-2.5 border-t border-amber-200/80 text-xs sm:text-sm text-slate-700 font-medium">
             <span className="font-bold text-slate-900">Instructions:</span>{' '}
             {activeAlarmMedication.instructions}
           </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="space-y-3">
+        <div className="space-y-2.5 sm:space-y-3">
           {/* Primary Take Medicine Button */}
           <button
             onClick={() => takeMedicineFromAlarm(activeAlarmMedication.id)}
-            className="w-full min-h-tap-lg px-6 py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-extrabold text-xl shadow-lg border-2 border-emerald-700 flex items-center justify-center gap-3 transform active:scale-95 transition-all"
+            className="w-full min-h-tap-lg px-4 py-3.5 sm:px-6 sm:py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-extrabold text-base sm:text-xl shadow-lg border-2 border-emerald-700 flex items-center justify-center gap-2.5 sm:gap-3 transform active:scale-95 transition-all"
           >
-            <Check className="w-7 h-7 stroke-[3]" />
+            <Check className="w-6 h-6 sm:w-7 sm:h-7 stroke-[3] shrink-0" />
             <span>I Have Taken It (Stop Alarm)</span>
           </button>
 
           {/* Snooze & Dismiss Row */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-2 sm:gap-3">
             <button
               onClick={() => snoozeAlarm(activeAlarmMedication.id, 5)}
-              className="min-h-tap px-4 py-3 bg-zinc-100 hover:bg-zinc-200 text-slate-800 border border-zinc-300 rounded-xl font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition-colors"
+              className="min-h-tap px-2 sm:px-4 py-2.5 sm:py-3 bg-zinc-100 hover:bg-zinc-200 text-slate-800 border border-zinc-300 rounded-xl font-bold text-xs sm:text-base flex items-center justify-center gap-1.5 sm:gap-2 transition-colors"
             >
-              <Clock className="w-4 h-4 text-slate-600" />
+              <Clock className="w-4 h-4 text-slate-600 shrink-0" />
               <span>Snooze (5 Mins)</span>
             </button>
 
             <button
               onClick={() => dismissAlarm(activeAlarmMedication.id)}
-              className="min-h-tap px-4 py-3 bg-zinc-100 hover:bg-zinc-200 text-slate-700 border border-zinc-300 rounded-xl font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition-colors"
+              className="min-h-tap px-2 sm:px-4 py-2.5 sm:py-3 bg-zinc-100 hover:bg-zinc-200 text-slate-700 border border-zinc-300 rounded-xl font-bold text-xs sm:text-base flex items-center justify-center gap-1.5 sm:gap-2 transition-colors"
             >
-              <X className="w-4 h-4 text-slate-500" />
+              <X className="w-4 h-4 text-slate-500 shrink-0" />
               <span>Silence Alarm</span>
             </button>
           </div>
