@@ -43,6 +43,7 @@ const githubSecret = cleanEnv(process.env.GITHUB_SECRET);
 const nextAuthSecret =
   cleanEnv(process.env.NEXTAUTH_SECRET) ||
   'dAZjBxe9pE+ez6hoLqaX4Zf91/eau1nlpes53aBDDfk=';
+process.env.NEXTAUTH_SECRET = nextAuthSecret;
 
 const providers: NextAuthOptions['providers'] = [
   CredentialsProvider({
