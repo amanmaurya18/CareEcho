@@ -160,7 +160,7 @@ class SoundEffects {
 
 export const soundEffects = new SoundEffects();
 
-// // Browser Web Speech API SpeechSynthesis Helper - Robust Multi-Language Synthesis
+// Browser Web Speech API SpeechSynthesis Helper - Robust Multi-Language Synthesis
 
 // Female voice name identifiers across Windows, macOS/iOS, Android, and Chrome/Edge
 const FEMALE_VOICE_KEYWORDS = [
@@ -179,8 +179,41 @@ const MALE_VOICE_KEYWORDS = [
   'madhur', 'hemant', 'valluvar', 'mohan', 'niranjan', 'gagan', 'midhun', 'bashkar',
 ];
 
-// Active pool to prevent Chromium V8 garbage collection of utterances
+// Active pool to prevent Chromium V8 garbage collection of utterances during playback
 const activeUtterances = new Set<SpeechSynthesisUtterance>();
+
+// Global keep-alive timer to prevent Chromium 15-second speech pause bug
+let keepAliveTimer: ReturnType<typeof setInterval> | null = null;
+
+function startKeepAlive() {
+  stopKeepAlive();
+  keepAliveTimer = setInterval(() => {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window && window.speechSynthesis.speaking) {
+      window.speechSynthesis.pause();
+      window.speechSynthesis.resume();
+    } else {
+      stopKeepAlive();
+    }
+  }, 3500);
+}
+
+function stopKeepAlive() {
+  if (keepAliveTimer) {
+    clearInterval(keepAliveTimer);
+    keepAliveTimer = null;
+  }
+}
+
+// Global voice cache for instant synchronous retrieval
+let cachedVoices: SpeechSynthesisVoice[] = [];
+if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+  try {
+    cachedVoices = window.speechSynthesis.getVoices();
+    window.speechSynthesis.onvoiceschanged = () => {
+      cachedVoices = window.speechSynthesis.getVoices();
+    };
+  } catch {}
+}
 
 // Clean and sanitize text for natural speech synthesis
 export function sanitizeTextForSpeech(text: string): string {
@@ -200,23 +233,28 @@ export function sanitizeTextForSpeech(text: string): string {
     // Remove Emojis and miscellaneous symbols that trip speech engines
     .replace(/([\uD800-\uDBFF][\uDC00-\uDFFF]|[\u2600-\u27BF])/g, '')
     // Replace common medical abbreviations for clear pronunciation
-    .replace(/\bmg\b/gi, 'milligrams')
-    .replace(/\bml\b/gi, 'milliliters')
-    .replace(/\btab\b/gi, 'tablet')
-    .replace(/\bcap\b/gi, 'capsule')
-    .replace(/\bbp\b/gi, 'blood pressure')
-    .replace(/\bhr\b/gi, 'heart rate')
+    .replace(/\bmg\b/gi, ' milligrams ')
+    .replace(/\bml\b/gi, ' milliliters ')
+    .replace(/\btab\b/gi, ' tablet ')
+    .replace(/\bcap\b/gi, ' capsule ')
+    .replace(/\bbp\b/gi, ' blood pressure ')
+    .replace(/\bhr\b/gi, ' heart rate ')
     // Normalize punctuation and whitespace
     .replace(/\s+/g, ' ')
     .trim();
 }
 
-// Split text into natural, digestible sentence chunks without truncating
+// Split large text into natural, digestible chunks without truncating
 export function splitIntoSentences(text: string): string[] {
   const cleaned = sanitizeTextForSpeech(text);
   if (!cleaned) return [];
 
-  // Split on sentence boundaries: period, exclamation, question mark, Indic danda, semicolon, or newlines
+  // If text is short or medium length (<= 300 characters), never chop it
+  if (cleaned.length <= 300) {
+    return [cleaned];
+  }
+
+  // Split on sentence boundaries: period, exclamation, question mark, Indic danda, or newlines
   const rawChunks = cleaned
     .split(/(?<=[.!?।;]|\n+)\s+/)
     .map((s) => s.trim())
@@ -225,26 +263,21 @@ export function splitIntoSentences(text: string): string[] {
   if (rawChunks.length === 0) return [cleaned];
 
   const result: string[] = [];
+  let currentGroup = '';
+
   for (const chunk of rawChunks) {
-    // If a single chunk is still quite long (> 120 characters), break at commas or conjunctions
-    if (chunk.length > 120 && chunk.includes(',')) {
-      const subParts = chunk.split(/,\s*/);
-      let currentSub = '';
-      for (const part of subParts) {
-        if (!part.trim()) continue;
-        if (currentSub && (currentSub.length + part.length > 110)) {
-          result.push(currentSub.trim());
-          currentSub = part;
-        } else {
-          currentSub = currentSub ? `${currentSub}, ${part}` : part;
-        }
-      }
-      if (currentSub.trim()) {
-        result.push(currentSub.trim());
-      }
+    if (!currentGroup) {
+      currentGroup = chunk;
+    } else if (currentGroup.length + chunk.length < 240) {
+      currentGroup = `${currentGroup} ${chunk}`;
     } else {
-      result.push(chunk);
+      result.push(currentGroup.trim());
+      currentGroup = chunk;
     }
+  }
+
+  if (currentGroup.trim()) {
+    result.push(currentGroup.trim());
   }
 
   return result.length > 0 ? result : [cleaned];
@@ -252,30 +285,40 @@ export function splitIntoSentences(text: string): string[] {
 
 // Helper to reliably fetch voices even if asynchronously loaded by the browser
 export function getAvailableVoices(): Promise<SpeechSynthesisVoice[]> {
+  if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
+    return Promise.resolve([]);
+  }
+
+  if (cachedVoices && cachedVoices.length > 0) {
+    return Promise.resolve(cachedVoices);
+  }
+
+  const immediate = window.speechSynthesis.getVoices();
+  if (immediate.length > 0) {
+    cachedVoices = immediate;
+    return Promise.resolve(immediate);
+  }
+
   return new Promise((resolve) => {
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
-      resolve([]);
-      return;
-    }
-
-    const immediate = window.speechSynthesis.getVoices();
-    if (immediate.length > 0) {
-      resolve(immediate);
-      return;
-    }
-
-    // Wait for voiceschanged event if initially empty
+    let resolved = false;
     const handleVoicesChanged = () => {
+      if (resolved) return;
+      resolved = true;
+      cachedVoices = window.speechSynthesis.getVoices();
       window.speechSynthesis.removeEventListener('voiceschanged', handleVoicesChanged);
-      resolve(window.speechSynthesis.getVoices());
+      resolve(cachedVoices);
     };
 
     window.speechSynthesis.addEventListener('voiceschanged', handleVoicesChanged);
 
-    // Safety timeout in case voiceschanged does not trigger
+    // Short safety timeout so user-gesture permission is preserved
     setTimeout(() => {
-      resolve(window.speechSynthesis.getVoices());
-    }, 600);
+      if (!resolved) {
+        resolved = true;
+        cachedVoices = window.speechSynthesis.getVoices();
+        resolve(cachedVoices);
+      }
+    }, 250);
   });
 }
 
@@ -288,41 +331,8 @@ export function findBestVoice(
 ): SpeechSynthesisVoice | null {
   if (!voices || voices.length === 0) return null;
 
-  // Determine script of sentence
-  const hasIndic = sampleSentence ? /[\u0900-\u0D7F]/.test(sampleSentence) : false;
-  const isDevanagari = sampleSentence ? /[\u0900-\u097F]/.test(sampleSentence) : false;
-  const isTamil = sampleSentence ? /[\u0B80-\u0BFF]/.test(sampleSentence) : false;
-  const isTelugu = sampleSentence ? /[\u0C00-\u0C7F]/.test(sampleSentence) : false;
-  const isBengali = sampleSentence ? /[\u0980-\u09FF]/.test(sampleSentence) : false;
-  const isGujarati = sampleSentence ? /[\u0A80-\u0AFF]/.test(sampleSentence) : false;
-  const isKannada = sampleSentence ? /[\u0C80-\u0CFF]/.test(sampleSentence) : false;
-  const isMalayalam = sampleSentence ? /[\u0D00-\u0D7F]/.test(sampleSentence) : false;
-  const isPunjabi = sampleSentence ? /[\u0A00-\u0A7F]/.test(sampleSentence) : false;
-
-  let effectiveLang = lang.toLowerCase().replace('_', '-');
-
-  // If text has NO Indic characters and is not Spanish, use an English voice for clear pronunciation
-  if (!hasIndic && !effectiveLang.startsWith('es')) {
-    effectiveLang = 'en-us';
-  } else if (isDevanagari) {
-    effectiveLang = 'hi-in';
-  } else if (isTamil) {
-    effectiveLang = 'ta-in';
-  } else if (isTelugu) {
-    effectiveLang = 'te-in';
-  } else if (isBengali) {
-    effectiveLang = 'bn-in';
-  } else if (isGujarati) {
-    effectiveLang = 'gu-in';
-  } else if (isKannada) {
-    effectiveLang = 'kn-in';
-  } else if (isMalayalam) {
-    effectiveLang = 'ml-in';
-  } else if (isPunjabi) {
-    effectiveLang = 'pa-in';
-  }
-
-  const langPrefix = effectiveLang.split('-')[0];
+  const normalizedLang = lang.toLowerCase().replace('_', '-');
+  const langPrefix = normalizedLang.split('-')[0];
 
   // Specific keyword identifiers for Indian and global languages
   const languageKeywordsMap: Record<string, string[]> = {
@@ -341,13 +351,13 @@ export function findBestVoice(
 
   const currentKeywords = languageKeywordsMap[langPrefix] || [langPrefix];
 
-  // Filter voices that match the target language or keywords
+  // 1. Direct match on language code or keywords
   const matchingVoices = voices.filter((v) => {
     const vLang = v.lang.toLowerCase().replace('_', '-');
     const vName = v.name.toLowerCase();
-    const vUri = v.voiceURI.toLowerCase();
+    const vUri = (v.voiceURI || '').toLowerCase();
 
-    const matchesLangCode = vLang === effectiveLang || vLang.startsWith(langPrefix);
+    const matchesLangCode = vLang === normalizedLang || vLang.startsWith(langPrefix);
     const matchesKeyword = currentKeywords.some((kw) => vName.includes(kw) || vUri.includes(kw));
 
     return matchesLangCode || matchesKeyword;
@@ -357,7 +367,7 @@ export function findBestVoice(
     if (gender === 'female') {
       const femaleMatch = matchingVoices.find((v) => {
         const name = v.name.toLowerCase();
-        const uri = v.voiceURI.toLowerCase();
+        const uri = (v.voiceURI || '').toLowerCase();
         return (
           FEMALE_VOICE_KEYWORDS.some((kw) => name.includes(kw) || uri.includes(kw)) &&
           !MALE_VOICE_KEYWORDS.some((kw) => name.includes(kw) || uri.includes(kw))
@@ -381,14 +391,16 @@ export function findBestVoice(
     return matchingVoices[0];
   }
 
-  // Fallback: Pick best available English voice or default system voice
-  // This guarantees speech NEVER crashes or goes silent if language pack is missing in OS
+  // 2. Fallback: English female or default system voice
   const englishFemaleVoice = voices.find((v) => {
     const langMatch = v.lang.toLowerCase().startsWith('en');
     const name = v.name.toLowerCase();
     return langMatch && FEMALE_VOICE_KEYWORDS.some((kw) => name.includes(kw));
   });
   if (englishFemaleVoice) return englishFemaleVoice;
+
+  const defaultVoice = voices.find((v) => v.default);
+  if (defaultVoice) return defaultVoice;
 
   const englishVoice = voices.find((v) => v.lang.toLowerCase().startsWith('en'));
   if (englishVoice) return englishVoice;
@@ -400,15 +412,15 @@ export function findBestVoice(
 export const findFemaleVoice = (voices: SpeechSynthesisVoice[], lang: string = 'en-US') =>
   findBestVoice(voices, lang, 'female');
 
-// Speak a single sentence chunk reliably without premature truncation
-function speakSentenceChunk(
-  sentence: string,
+// Speak a single text chunk completely without truncation
+function speakChunk(
+  textToSpeak: string,
   voice: SpeechSynthesisVoice | null,
   lang: string,
   gender: 'female' | 'male'
 ): Promise<void> {
   return new Promise((resolve) => {
-    const trimmed = sentence.trim();
+    const trimmed = textToSpeak.trim();
     if (!trimmed || typeof window === 'undefined' || !('speechSynthesis' in window)) {
       resolve();
       return;
@@ -420,21 +432,25 @@ function speakSentenceChunk(
 
     if (voice) {
       utterance.voice = voice;
-      utterance.lang = voice.lang;
+      utterance.lang = voice.lang || lang;
     } else {
       utterance.lang = lang;
     }
 
     // Pin utterance in global active pool to prevent Chromium GC cancellation
     activeUtterances.add(utterance);
+    startKeepAlive();
 
+    let finished = false;
     const cleanup = () => {
+      if (finished) return;
+      finished = true;
       activeUtterances.delete(utterance);
+      stopKeepAlive();
     };
 
     // Generous dynamic timeout based on length: never truncate normal sentences
-    // (At rate 0.90, average 15 words/minute is ~15-20 characters per second)
-    const timeoutMs = Math.max(16000, trimmed.length * 250);
+    const timeoutMs = Math.max(14000, trimmed.length * 160);
     const timer = setTimeout(() => {
       cleanup();
       resolve();
@@ -449,9 +465,8 @@ function speakSentenceChunk(
     utterance.onerror = (e) => {
       clearTimeout(timer);
       cleanup();
-      // 'canceled' or 'interrupted' can happen on user navigation or new click
       if (e.error !== 'canceled' && e.error !== 'interrupted') {
-        console.warn('Speech synthesis sentence notice:', e.error);
+        console.warn('Speech synthesis notice:', e.error);
       }
       resolve();
     };
@@ -469,7 +484,7 @@ function speakSentenceChunk(
   });
 }
 
-// Main speakText function: speaks all sentences completely without premature cutoff
+// Main speakText function: speaks all content completely without premature cutoff
 export async function speakText(
   text: string,
   lang: string = 'en-US',
@@ -479,7 +494,10 @@ export async function speakText(
     return;
   }
 
-  // Cancel any prior speech cleanly and wait briefly for audio channel to clear
+  const cleaned = sanitizeTextForSpeech(text);
+  if (!cleaned) return;
+
+  // Cancel any prior speech cleanly
   try {
     if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
       window.speechSynthesis.cancel();
@@ -492,19 +510,22 @@ export async function speakText(
     }
   } catch {}
 
-  const sentences = splitIntoSentences(text);
-  if (sentences.length === 0) return;
-
   const voices = await getAvailableVoices();
+  const selectedVoice = findBestVoice(voices, lang, gender, cleaned);
 
-  // Speak every single sentence chunk sequentially with a clean inter-sentence buffer
-  for (let i = 0; i < sentences.length; i++) {
-    const sentence = sentences[i];
-    const selectedVoice = findBestVoice(voices, lang, gender, sentence);
-    await speakSentenceChunk(sentence, selectedVoice, lang, gender);
+  // If text is standard size (<= 300 chars, covering all reminders and answers),
+  // speak as ONE single complete utterance to prevent Chromium inter-sentence drop/stalls!
+  if (cleaned.length <= 300) {
+    await speakChunk(cleaned, selectedVoice, lang, gender);
+    return;
+  }
 
-    // Natural 80ms breathing pause between sentences to let Chromium audio pipe settle
-    if (i < sentences.length - 1) {
+  // Only for very long texts (> 300 chars), split into large chunk paragraphs
+  const chunks = splitIntoSentences(cleaned);
+  for (let i = 0; i < chunks.length; i++) {
+    const chunk = chunks[i];
+    await speakChunk(chunk, selectedVoice, lang, gender);
+    if (i < chunks.length - 1) {
       await new Promise((r) => setTimeout(r, 80));
     }
   }

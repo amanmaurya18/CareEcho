@@ -29,12 +29,15 @@ export const MedicationCard: React.FC<MedicationCardProps> = ({ medication }) =>
   const handleSpeak = async () => {
     soundEffects.playTap();
     setIsSpeaking(true);
-    let text = `${medication.name} ${medication.dosage}, ${t('scheduledFor', { time: medication.scheduledTime, slot: translateTimeOfDay(medication.timeOfDay) })}. ${translateInstruction(medication.instructions)}`;
+    let text = `${medication.name} ${medication.dosage}, ${t('scheduledFor', { time: medication.scheduledTime, slot: translateTimeOfDay(medication.timeOfDay) })}. ${t('directions')}: ${translateInstruction(medication.instructions)}.`;
     if (isTaken) {
       text += ` ${t('completed')}.`;
     }
-    await speakText(text, language, voiceGender);
-    setIsSpeaking(false);
+    try {
+      await speakText(text, language, voiceGender);
+    } finally {
+      setIsSpeaking(false);
+    }
   };
 
   return (

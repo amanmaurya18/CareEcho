@@ -132,6 +132,18 @@ function generateNaturalResponse({
   const q = query.trim().toLowerCase();
   const lang = language.toLowerCase();
 
+  const targetLang: SupportedLanguage =
+    lang.startsWith('hi') ? 'hi-IN' :
+    lang.startsWith('es') ? 'es-ES' :
+    lang.startsWith('ta') ? 'ta-IN' :
+    lang.startsWith('te') ? 'te-IN' :
+    lang.startsWith('bn') ? 'bn-IN' :
+    lang.startsWith('mr') ? 'mr-IN' :
+    lang.startsWith('gu') ? 'gu-IN' :
+    lang.startsWith('kn') ? 'kn-IN' :
+    lang.startsWith('ml') ? 'ml-IN' :
+    lang.startsWith('pa') ? 'pa-IN' : 'en-US';
+
   // --- A. GREETINGS ---
   const isGreeting =
     /^(hi|hello|hey|good morning|good afternoon|good evening|howdy|greetings)\b/i.test(q) ||
@@ -226,28 +238,21 @@ function generateNaturalResponse({
   // --- C. OFF-TOPIC REDIRECTION ---
   // If the query has nothing to do with medicine or schedule, guide them back warmly.
   if (!isMedicineRelated) {
-    if (lang.startsWith('hi')) {
-      const hiRedirects = [
-        `मैं केवल आपकी दवाओं और स्वास्थ्य दिनचर्या में सहायता के लिए हूँ, ${patientName}। कृपया मुझसे अपनी दवाओं, खुराक या समय के बारे में कोई भी प्रश्न पूछें!`,
-        `मैं आपकी दवाइयों की साथी CareEcho हूँ। अपनी किसी भी दवा, खुराक या समय-सारणी के बारे में निसंकोच पूछें!`,
-      ];
-      return hiRedirects[Math.floor(Math.random() * hiRedirects.length)];
-    }
+    const redirectMap: Record<SupportedLanguage, string> = {
+      'hi-IN': `मैं केवल आपकी दवाओं और स्वास्थ्य दिनचर्या में सहायता के लिए हूँ, ${patientName}। अपनी किसी भी दवा, खुराक या समय के बारे में पूछें!`,
+      'es-ES': `Estoy aquí específicamente para ayudarle con sus medicamentos y horario diario, ${patientName}. ¡Por favor hágame cualquier pregunta sobre sus medicinas o dosis!`,
+      'ta-IN': `நான் உங்கள் மருந்துகளுக்கும் தினசரி அட்டவணைக்கும் உதவ இங்கே இருக்கிறேன், ${patientName}. உங்கள் மருந்துகள் மற்றும் நேரம் பற்றி கேளுங்கள்!`,
+      'te-IN': `నేను మీ మందులు మరియు రోజువారీ షెడ్యూల్ కోసం మాత్రమే ఇక్కడ ఉన్నాను, ${patientName}. మీ మందుల వివరాలు లేదా సమయం అడగండి!`,
+      'bn-IN': `আমি কেবল আপনার ওষুধ ও স্বাস্থ্য রুটিনে সাহায্য করার জন্য আছি, ${patientName}। আপনার ওষুধের মাত্রা বা সময়সূচী সম্পর্কে প্রশ্ন করুন!`,
+      'mr-IN': `मी फक्त तुमच्या औषधांच्या मदतीसाठी येथे आहे, ${patientName}. तुमच्या गोळ्या, खुराक किंवा वेळेबद्दल निसंकोच विचारा!`,
+      'gu-IN': `હું ફક્ત તમારી દવાઓ અને સ્વાસ્થ્ય નિયમ માટે અહીં છું, ${patientName}. તમારી દવાઓ, માત્રા અથવા સમય વિશે પૂછો!`,
+      'kn-IN': `ನಾನು ನಿಮ್ಮ ಔಷಧಿಗಳ ಸಹಾಯಕ್ಕಾಗಿ ಇಲ್ಲಿದ್ದೇನೆ, ${patientName}. ನಿಮ್ಮ ಔಷಧಿ ವೇಳಾಪಟ್ಟಿ ಅಥವಾ ಸಮಯದ ಬಗ್ಗೆ ಕೇಳಿ!`,
+      'ml-IN': `നിങ്ങളുടെ മരുന്നുകളിലും ദിനചര്യകളിലും സഹായിക്കാനാണ് ഞാൻ ഇവിടെയുള്ളത്, ${patientName}. മരുന്നുകളുടെ സമയത്തെക്കുറിച്ചും അളവിനെക്കുറിച്ചും ചോദിക്കൂ!`,
+      'pa-IN': `ਮੈਂ ਸਿਰਫ਼ ਤੁਹਾਡੀ ਦਵਾਈਆਂ ਵਿੱਚ ਮਦਦ ਕਰਨ ਲਈ ਇੱਥੇ ਹਾਂ, ${patientName}। ਆਪਣੀ ਦਵਾਈ, ਖੁਰਾਕ ਜਾਂ ਸਮੇਂ ਬਾਰੇ ਪੁੱਛੋ!`,
+      'en-US': `I am here specifically to help you with your medications and daily schedule, ${patientName}. Please ask me any questions about your pills, timings, or dosages!`,
+    };
 
-    if (lang.startsWith('es')) {
-      const esRedirects = [
-        `Estoy aquí específicamente para ayudarle con sus medicamentos y horario diario, ${patientName}. ¡Por favor, hágame cualquier pregunta sobre sus medicinas o dosis!`,
-        `Como su compañero de salud CareEcho, estoy dedicado a sus medicamentos. Por favor, consúlteme sobre sus pastillas, horarios o instrucciones médicas.`,
-      ];
-      return esRedirects[Math.floor(Math.random() * esRedirects.length)];
-    }
-
-    const enRedirects = [
-      `I am here specifically to help you with your medications and daily schedule, ${patientName}. Please ask me any questions about your pills, timings, or dosages!`,
-      `I focus entirely on keeping your medications on track, ${patientName}. Feel free to ask me anything about your pills, schedule, or instructions!`,
-      `As your CareEcho companion, I am dedicated to your prescriptions and daily routine. Please ask me about any medicine, dosage, or timing!`,
-    ];
-    return enRedirects[Math.floor(Math.random() * enRedirects.length)];
+    return redirectMap[targetLang] || redirectMap['en-US'];
   }
 
   // --- D. CHECK AGAINST THE MEDICINE LIST ---
@@ -266,24 +271,11 @@ function generateNaturalResponse({
     return `I checked your active prescription list, and ${drugCap} is not listed in your scheduled medications. Your active medicines are ${activeNames}. Please consult your doctor or caregiver before taking anything new.`;
   }
 
-  // Determine typed target language
-  const targetLang: SupportedLanguage =
-    lang.startsWith('hi') ? 'hi-IN' :
-    lang.startsWith('es') ? 'es-ES' :
-    lang.startsWith('ta') ? 'ta-IN' :
-    lang.startsWith('te') ? 'te-IN' :
-    lang.startsWith('bn') ? 'bn-IN' :
-    lang.startsWith('mr') ? 'mr-IN' :
-    lang.startsWith('gu') ? 'gu-IN' :
-    lang.startsWith('kn') ? 'kn-IN' :
-    lang.startsWith('ml') ? 'ml-IN' :
-    lang.startsWith('pa') ? 'pa-IN' : 'en-US';
-
   // 2. Did the user ask about a specific medicine from their list?
   const matchedMed = medications.find(matchesMed);
 
   if (matchedMed) {
-    const isAskingTiming = q.includes('when') || q.includes('time') || q.includes('schedule') || q.includes('कब') || q.includes('समय') || q.includes('cuándo') || q.includes('hora');
+    const isAskingTiming = q.includes('when') || q.includes('time') || q.includes('schedule') || q.includes('कब') || q.includes('समय') || q.includes('cuándo') || q.includes('hora') || q.includes('நேரம்') || q.includes('సమయం');
     const isAskingPurpose = q.includes('why') || q.includes('what for') || q.includes('purpose') || q.includes('किसलिए') || q.includes('काम') || q.includes('para qué') || q.includes('por qué');
     const isAskingTaken = q.includes('did i take') || q.includes('have i taken') || q.includes('taken') || q.includes('status') || q.includes('ली') || q.includes('ले ली') || q.includes('ya tomé');
     const isAskingFood = q.includes('food') || q.includes('water') || q.includes('meal') || q.includes('breakfast') || q.includes('dinner') || q.includes('खाना') || q.includes('पानी') || q.includes('comida') || q.includes('agua');
@@ -343,41 +335,59 @@ function generateNaturalResponse({
   }
 
   // 3. Asking about upcoming / next dose
-  const isNextQuery = q.includes('next') || q.includes('upcoming') || q.includes('अगली') || q.includes('próximo') || q.includes('siguiente');
+  const isNextQuery = q.includes('next') || q.includes('upcoming') || q.includes('अगली') || q.includes('próximo') || q.includes('siguiente') || q.includes('அடுத்த') || q.includes('తదుపరి') || q.includes('পরবর্তী') || q.includes('पुढील') || q.includes('આગામી') || q.includes('ಮುಂದಿನ') || q.includes('അടുത്ത') || q.includes('ਅਗਲੀ');
   if (isNextQuery) {
     const pendingMeds = medications.filter((m) => m.status === 'pending');
     if (pendingMeds.length === 0) {
-      if (lang.startsWith('hi')) return `बहुत खूब ${patientName}! आपने आज की सभी निर्धारित दवाएं ले ली हैं। आराम करें और खूब पानी पिएं।`;
-      if (lang.startsWith('es')) return `¡Excelente trabajo ${patientName}! Ya ha tomado todos sus medicamentos programados para hoy. Descanse y manténgase hidratado.`;
-      return `Wonderful job ${patientName}! You have already taken all of your scheduled medications for today. Rest well and stay hydrated.`;
+      const allDoneMap: Record<SupportedLanguage, string> = {
+        'hi-IN': `बहुत खूब ${patientName}! आपने आज की सभी निर्धारित दवाएं ले ली हैं। आराम करें और खूब पानी पिएं।`,
+        'es-ES': `¡Excelente trabajo ${patientName}! Ya ha tomado todos sus medicamentos programados para hoy. Descanse bien e hidrátese.`,
+        'ta-IN': `அருமை ${patientName}! இன்றைய அனைத்து மருந்துகளையும் எடுத்துவிட்டீர்கள். நன்றாக ஓய்வெடுக்கவும்.`,
+        'te-IN': `అద్భుతం ${patientName}! నేటి అన్ని మందులు తీసుకోబడ్డాయి. విశ్రాంతి తీసుకోండి.`,
+        'bn-IN': `চমৎকার ${patientName}! আজকের সব ওষুধ খাওয়া সম্পন্ন হয়েছে। বিশ্রাম নিন।`,
+        'mr-IN': `छान ${patientName}! आजची सर्व औषधे घेतली गेली आहेत. विश्रांती घ्या.`,
+        'gu-IN': `ખૂબ સરસ ${patientName}! આજની બધી દવાઓ લેવાઈ ગઈ છે. આરામ કરો.`,
+        'kn-IN': `ಅದ್ಭುತ ${patientName}! ಇಂದಿನ ಎಲ್ಲಾ ಔಷಧಿಗಳನ್ನು ತೆಗೆದುಕೊಳ್ಳಲಾಗಿದೆ. ವಿಶ್ರಾಂತಿ ಪಡೆಯಿರಿ.`,
+        'ml-IN': `വളരെ നല്ലത് ${patientName}! ഇന്നത്തെ എല്ലാ മരുന്നുകളും കഴിച്ചു കഴിഞ്ഞു. വിശ്രമിക്കുക.`,
+        'pa-IN': `ਬਹੁਤ ਵਧੀਆ ${patientName}! ਅੱਜ ਦੀਆਂ ਸਾਰੀਆਂ ਦਵਾਈਆਂ ਲਈਆਂ ਜਾ ਚੁੱਕੀਆਂ ਹਨ। ਆਰਾਮ ਕਰੋ।`,
+        'en-US': `Wonderful job ${patientName}! You have already taken all of your scheduled medications for today. Rest well and stay hydrated.`,
+      };
+      return allDoneMap[targetLang] || allDoneMap['en-US'];
     }
 
     const next = pendingMeds[0];
     const nextInst = translateInstruction(next.instructions, targetLang);
     const nextSlot = translateTimeOfDay(next.timeOfDay, targetLang);
-    if (lang.startsWith('hi')) return `आपकी अगली दवा ${next.name} ${next.dosage} है, जो ${next.scheduledTime} (${nextSlot}) के लिए निर्धारित है। ${nextInst}`;
-    if (lang.startsWith('es')) return `Su próximo medicamento es ${next.name} ${next.dosage} a las ${next.scheduledTime} (${nextSlot}). ${nextInst}`;
-    return `Your next upcoming medicine is ${next.name} ${next.dosage} scheduled for ${next.scheduledTime} (${nextSlot}). ${nextInst}`;
+
+    const nextMap: Record<SupportedLanguage, string> = {
+      'hi-IN': `आपकी अगली दवा ${next.name} ${next.dosage} है, जो ${next.scheduledTime} (${nextSlot}) के लिए निर्धारित है। निर्देश: ${nextInst}`,
+      'es-ES': `Su próximo medicamento es ${next.name} ${next.dosage} a las ${next.scheduledTime} (${nextSlot}). Instrucciones: ${nextInst}`,
+      'ta-IN': `உங்கள் அடுத்த மருந்து ${next.name} ${next.dosage}, நேரம் ${next.scheduledTime} (${nextSlot}). குறிப்பு: ${nextInst}`,
+      'te-IN': `మీ తదుపరి మందు ${next.name} ${next.dosage}, సమయం ${next.scheduledTime} (${nextSlot}). సూచన: ${nextInst}`,
+      'bn-IN': `আপনার পরবর্তী ওষুধ ${next.name} ${next.dosage}, সময় ${next.scheduledTime} (${nextSlot})। নির্দেশ: ${nextInst}`,
+      'mr-IN': `तुमचे पुढील औषध ${next.name} ${next.dosage} आहे, वेळ ${next.scheduledTime} (${nextSlot}). सूचना: ${nextInst}`,
+      'gu-IN': `તમારી આગામી દવા ${next.name} ${next.dosage} છે, સમય ${next.scheduledTime} (${nextSlot}). સૂચના: ${nextInst}`,
+      'kn-IN': `ನಿಮ್ಮ ಮುಂದಿನ ಔಷಧಿ ${next.name} ${next.dosage}, ಸಮಯ ${next.scheduledTime} (${nextSlot}). ಸೂಚನೆ: ${nextInst}`,
+      'ml-IN': `നിങ്ങളുടെ അടുത്ത മരുന്ന് ${next.name} ${next.dosage}, സമയം ${next.scheduledTime} (${nextSlot}). നിർദ്ദേശം: ${nextInst}`,
+      'pa-IN': `ਤੁਹਾਡੀ ਅਗਲੀ ਦਵਾਈ ${next.name} ${next.dosage} ਹੈ, ਸਮਾਂ ${next.scheduledTime} (${nextSlot})। ਹਦਾਇਤ: ${nextInst}`,
+      'en-US': `Your next upcoming medicine is ${next.name} ${next.dosage} scheduled for ${next.scheduledTime} (${nextSlot}). Directions: ${nextInst}`,
+    };
+
+    return nextMap[targetLang] || nextMap['en-US'];
   }
 
   // 4. Asking about pending / remaining doses
-  const isPendingQuery = q.includes('pending') || q.includes('left') || q.includes('remaining') || q.includes('बाकी') || q.includes('pendiente') || q.includes('queda');
+  const isPendingQuery = q.includes('pending') || q.includes('left') || q.includes('remaining') || q.includes('बाकी') || q.includes('pendiente') || q.includes('queda') || q.includes('மீதி') || q.includes('మిగిలిన');
   if (isPendingQuery) {
     const pending = medications.filter((m) => m.status === 'pending');
-    if (lang.startsWith('hi')) {
-      if (pending.length === 0) return `आपकी कोई भी दवा बाकी नहीं है! आज की सभी खुराक पूरी हो चुकी हैं।`;
-      const list = pending.map((m) => `${m.name} (${m.scheduledTime})`).join(', ');
-      return `आज आपकी ${pending.length} दवाएं बाकी हैं: ${list}।`;
-    }
-    if (lang.startsWith('es')) {
-      if (pending.length === 0) return `¡No tiene medicamentos pendientes! Todas sus dosis de hoy están completadas.`;
-      const list = pending.map((m) => `${m.name} a las ${m.scheduledTime}`).join(', ');
-      return `Tiene ${pending.length} medicamento${pending.length > 1 ? 's' : ''} pendiente${pending.length > 1 ? 's' : ''} hoy: ${list}.`;
-    }
     if (pending.length === 0) {
+      if (lang.startsWith('hi')) return `आपकी कोई भी दवा बाकी नहीं है! आज की सभी खुराक पूरी हो चुकी हैं।`;
+      if (lang.startsWith('es')) return `¡No tiene medicamentos pendientes! Todas sus dosis de hoy están completadas.`;
       return `You have zero pending medications! All doses for today are completely marked as taken.`;
     }
-    const list = pending.map((m) => `${m.name} at ${m.scheduledTime}`).join(', ');
+    const list = pending.map((m) => `${m.name} (${m.scheduledTime})`).join(', ');
+    if (lang.startsWith('hi')) return `आज आपकी ${pending.length} दवाएं बाकी हैं: ${list}।`;
+    if (lang.startsWith('es')) return `Tiene ${pending.length} medicamento${pending.length > 1 ? 's' : ''} pendiente${pending.length > 1 ? 's' : ''} hoy: ${list}.`;
     return `You have ${pending.length} pending medication${pending.length > 1 ? 's' : ''} left today: ${list}.`;
   }
 

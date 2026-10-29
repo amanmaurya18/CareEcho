@@ -84,15 +84,24 @@ export const CurrentDoseBanner: React.FC = () => {
   const handleReadAloud = async () => {
     soundEffects.playTap();
     setIsSpeaking(true);
-    const speechText = t('nextMedicationSpoken', {
+    let speechText = t('nextMedicationSpoken', {
       name: nextMedication.name,
       dosage: nextMedication.dosage,
       time: nextMedication.scheduledTime,
       instructions: translateInstruction(nextMedication.instructions),
     });
 
-    await speakText(speechText, language, voiceGender);
-    setIsSpeaking(false);
+    if (isTaken) {
+      speechText += ` (${t('completed')})`;
+    } else if (isOverdue) {
+      speechText = `${t('overdue')}: ` + speechText;
+    }
+
+    try {
+      await speakText(speechText, language, voiceGender);
+    } finally {
+      setIsSpeaking(false);
+    }
   };
 
   return (

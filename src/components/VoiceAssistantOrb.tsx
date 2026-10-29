@@ -148,16 +148,22 @@ export const VoiceAssistantOrb: React.FC = () => {
 
       // Speak back
       setIsSpeaking(true);
-      await speakText(reply, language, voiceGender);
-      setIsSpeaking(false);
+      try {
+        await speakText(reply, language, voiceGender);
+      } finally {
+        setIsSpeaking(false);
+      }
     } catch (e) {
       // Local graceful fallback in selected language
       const fallbackReply = t('fallbackCompanionReply', { name: patientName.split(' ')[0] });
       setResponseText(fallbackReply);
       addVoiceCheckIn(queryText, fallbackReply, 'good');
       setIsSpeaking(true);
-      await speakText(fallbackReply, language, voiceGender);
-      setIsSpeaking(false);
+      try {
+        await speakText(fallbackReply, language, voiceGender);
+      } finally {
+        setIsSpeaking(false);
+      }
     } finally {
       setIsThinking(false);
     }
@@ -173,7 +179,7 @@ export const VoiceAssistantOrb: React.FC = () => {
       'mr-IN': `नमस्कार ${firstName}! तुम्ही लॉग इन आहात आणि मी तुमच्या औषधांच्या वेळापत्रकासह तयार आहे. आज तुम्हाला कसे वाटत आहे?`,
       'gu-IN': `નમસ્તે ${firstName}! તમે લોગ ઇન છો અને હું તમારી દવાઓના સમયપત્રક સાથે તૈયાર છું. આજે તમે કેવું અનુભવો છો?`,
       'kn-IN': `ನಮಸ್ಕಾರ ${firstName}! ನೀವು ಲಾಗಿನ್ ಆಗಿದ್ದೀರಿ ಮತ್ತು ನಿಮ್ಮ ಔಷಧಿ ವೇಳಾಪಟ್ಟಿ ಸಿದ್ಧವಾಗಿದೆ. ಇಂದು ನಿಮಗೆ ಹೇಗನಿಸುತ್ತಿದೆ?`,
-      'ml-IN': `നമസ്കാരം ${firstName}! നിങ്ങൾ ലോഗിൻ ചെയ്തിരിക്കുന്നു, നിങ്ങളുടെ മരുന്ന് ഷെഡ്യൂൾ തയ്യാറാണ്. இன்று உங்களுக்கு சுகമാണോ?`,
+      'ml-IN': `നമസ്കാരം ${firstName}! നിങ്ങൾ ലോഗിൻ ചെയ്തിരിക്കുന്നു, നിങ്ങളുടെ മരുന്ന് ഷെഡ്യൂൾ തയ്യാറാണ്. ಇಂದು ನಿಮಗೆ ಹೇಗನಿಸುತ್ತಿದೆ?`,
       'pa-IN': `ਸਤਿ ਸ਼੍ਰੀ ਅਕਾਲ ${firstName}! ਤੁਸੀਂ ਲੌਗਇਨ ਹੋ ਅਤੇ ਮੈਂ ਤੁਹਾਡੀ ਦਵਾਈਆਂ ਦੀ ਸਮਾਂ-ਸਾਰਣੀ ਨਾਲ ਤਿਆਰ ਹਾਂ। ਅੱਜ ਤੁਸੀਂ ਕਿਵੇਂ ਮਹਿਸੂਸ ਕਰ ਰਹੇ ਹੋ?`,
       'es-ES': `¡Hola ${firstName}! Su horario de medicamentos está listo. ¿Cómo se siente hoy?`,
       'en-US': `Hello ${firstName}! You are logged in, and I am right here with your daily medication schedule. How can I help you today?`,
@@ -183,8 +189,11 @@ export const VoiceAssistantOrb: React.FC = () => {
     setResponseText(greeting);
     addVoiceCheckIn('Check-in Greeting', greeting, 'good');
     setIsSpeaking(true);
-    await speakText(greeting, language, voiceGender);
-    setIsSpeaking(false);
+    try {
+      await speakText(greeting, language, voiceGender);
+    } finally {
+      setIsSpeaking(false);
+    }
   };
 
   const handleManualSubmit = async (e: React.FormEvent) => {
