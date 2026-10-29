@@ -10,7 +10,7 @@ interface SosModalProps {
 }
 
 export const SosModal: React.FC<SosModalProps> = ({ isOpen, onClose }) => {
-  const { triggerSos, caregiverName, caregiverPhone, patientName } = useCare();
+  const { t, triggerSos, caregiverName, caregiverPhone, patientName } = useCare();
   const [sosSent, setSosSent] = useState(false);
   const [isSending, setIsSending] = useState(false);
 
@@ -82,10 +82,10 @@ export const SosModal: React.FC<SosModalProps> = ({ isOpen, onClose }) => {
         ) : (
           <div>
             <h2 className="text-xl sm:text-3xl font-extrabold text-slate-900 mb-1.5 sm:mb-2 leading-tight">
-              Emergency SOS Assistance
+              {t('emergencySos')}
             </h2>
             <p className="text-sm sm:text-lg text-slate-700 mb-4 sm:mb-6 leading-relaxed">
-              Do you need immediate help, {patientName.split(' ')[0]}? Pressing confirm will sound an audible alarm and alert {caregiverName} instantly.
+              {t('emergencyModeDesc')} — {caregiverName}
             </p>
 
             <div className="space-y-2.5 sm:space-y-3">
@@ -96,16 +96,16 @@ export const SosModal: React.FC<SosModalProps> = ({ isOpen, onClose }) => {
                 className="min-h-tap-lg w-full px-4 py-3.5 sm:px-6 sm:py-4 bg-sos-600 hover:bg-sos-700 text-white rounded-2xl font-extrabold text-base sm:text-xl shadow-lg border-2 border-sos-700 flex items-center justify-center gap-2.5 sm:gap-3 transform active:scale-95"
               >
                 <ShieldAlert className="w-6 h-6 sm:w-7 sm:h-7 shrink-0" />
-                <span>{isSending ? 'Sending Alert...' : 'Yes, Send Emergency Alert'}</span>
+                <span>{isSending ? 'Sending Alert...' : t('callingCaregiver')}</span>
               </button>
 
-              {/* Call 911 Direct Option */}
+              {/* Call Direct Option */}
               <a
-                href="tel:911"
+                href="tel:112"
                 className="min-h-tap w-full px-4 py-3 bg-zinc-100 hover:bg-zinc-200 text-slate-900 border border-zinc-300 rounded-2xl font-bold text-sm sm:text-base flex items-center justify-center gap-2"
               >
                 <Phone className="w-4 h-4 sm:w-5 sm:h-5 text-sos-600 shrink-0" />
-                <span>Call Emergency Services (911)</span>
+                <span>{t('emergencyServices')}</span>
               </a>
 
               {/* Cancel Button */}
@@ -113,7 +113,7 @@ export const SosModal: React.FC<SosModalProps> = ({ isOpen, onClose }) => {
                 onClick={handleClose}
                 className="min-h-tap w-full px-4 py-2 text-slate-600 hover:text-slate-900 font-semibold text-sm sm:text-base"
               >
-                Cancel / False Alarm
+                {t('cancelEmergency')}
               </button>
             </div>
           </div>

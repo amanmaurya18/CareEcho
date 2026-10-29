@@ -11,7 +11,17 @@ interface MedicationCardProps {
 }
 
 export const MedicationCard: React.FC<MedicationCardProps> = ({ medication }) => {
-  const { markAsTaken, markAsPending, language, voiceGender, openAddMedicine } = useCare();
+  const {
+    t,
+    translateInstruction,
+    translatePurpose,
+    translateTimeOfDay,
+    markAsTaken,
+    markAsPending,
+    language,
+    voiceGender,
+    openAddMedicine,
+  } = useCare();
   const [isSpeaking, setIsSpeaking] = useState(false);
 
   const isTaken = medication.status === 'taken';
@@ -19,9 +29,9 @@ export const MedicationCard: React.FC<MedicationCardProps> = ({ medication }) =>
   const handleSpeak = async () => {
     soundEffects.playTap();
     setIsSpeaking(true);
-    let text = `${medication.name} ${medication.dosage}, scheduled for ${medication.scheduledTime}. ${medication.instructions}`;
+    let text = `${medication.name} ${medication.dosage}, ${t('scheduledFor', { time: medication.scheduledTime, slot: translateTimeOfDay(medication.timeOfDay) })}. ${translateInstruction(medication.instructions)}`;
     if (isTaken) {
-      text += ` This was already marked as taken today.`;
+      text += ` ${t('completed')}.`;
     }
     await speakText(text, language, voiceGender);
     setIsSpeaking(false);
@@ -72,26 +82,26 @@ export const MedicationCard: React.FC<MedicationCardProps> = ({ medication }) =>
                     : 'bg-amber-pendingBg text-amber-pending border border-amber-pendingBorder'
                 }`}
               >
-                {isTaken ? `✓ Taken (${medication.takenAt || 'Today'})` : 'Pending'}
+                {isTaken ? `✓ ${t('completed')} (${medication.takenAt || t('today')})` : t('markPending')}
               </span>
             </div>
 
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-slate-600 text-xs sm:text-base font-medium">
               <div className="flex items-center gap-1">
                 <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-500 shrink-0" />
-                <span>{medication.scheduledTime} ({medication.timeOfDay})</span>
+                <span>{t('scheduledFor', { time: medication.scheduledTime, slot: translateTimeOfDay(medication.timeOfDay) })}</span>
               </div>
 
               {medication.purpose && (
                 <div className="flex items-center gap-1 text-slate-500 truncate">
                   <span>•</span>
-                  <span className="truncate">{medication.purpose}</span>
+                  <span className="truncate">{translatePurpose(medication.purpose)}</span>
                 </div>
               )}
             </div>
 
             <p className="text-xs sm:text-base text-slate-700 mt-2 bg-zinc-50 p-2 sm:p-2.5 rounded-lg border border-zinc-200 leading-relaxed">
-              <span className="font-bold text-slate-900">Note:</span> {medication.instructions}
+              <span className="font-bold text-slate-900">{t('directions')}:</span> {translateInstruction(medication.instructions)}
             </p>
           </div>
         </div>
@@ -126,7 +136,7 @@ export const MedicationCard: React.FC<MedicationCardProps> = ({ medication }) =>
               className="flex-1 sm:flex-initial min-h-tap px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl border border-zinc-300 bg-zinc-100 hover:bg-zinc-200 text-slate-700 font-bold text-xs sm:text-base flex items-center justify-center gap-1.5 transition-colors active:scale-95"
             >
               <RotateCcw className="w-4 h-4" />
-              <span>Undo</span>
+              <span>{t('undo')}</span>
             </button>
           ) : (
             <button
@@ -135,7 +145,7 @@ export const MedicationCard: React.FC<MedicationCardProps> = ({ medication }) =>
               className="flex-1 sm:flex-initial min-h-tap px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-sage-600 hover:bg-sage-700 text-white font-bold text-xs sm:text-base flex items-center justify-center gap-1.5 shadow-sm transition-colors active:scale-95"
             >
               <Check className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2.5]" />
-              <span>Mark Taken</span>
+              <span>{t('markAsTaken')}</span>
             </button>
           )}
         </div>

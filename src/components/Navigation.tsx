@@ -4,31 +4,33 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Heart, Camera, Activity, ShieldCheck } from 'lucide-react';
+import { useCare } from '@/context/CareContext';
 
 export const Navigation: React.FC = () => {
   const pathname = usePathname();
+  const { t } = useCare();
 
   const links = [
     {
-      name: 'Senior Companion',
-      shortName: 'Companion',
+      name: t('seniorCompanion'),
+      shortName: t('companionNav'),
       href: '/',
       icon: Heart,
-      badge: 'Daily',
+      badge: t('daily'),
     },
     {
-      name: 'Scan Prescription',
-      shortName: 'Scan Rx',
+      name: t('scanPrescription'),
+      shortName: t('scanRx'),
       href: '/scan',
       icon: Camera,
-      badge: 'OCR',
+      badge: t('ocr'),
     },
     {
-      name: 'Caregiver Portal',
-      shortName: 'Caregiver',
+      name: t('caregiverPortal'),
+      shortName: t('caregiverNav'),
       href: '/caregiver',
       icon: ShieldCheck,
-      badge: 'Family',
+      badge: t('family'),
     },
   ];
 

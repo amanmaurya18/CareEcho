@@ -24,7 +24,13 @@ import {
 } from 'lucide-react';
 
 export const PrescriptionUploader: React.FC = () => {
-  const { addPrescriptionMedicines } = useCare();
+  const {
+    addPrescriptionMedicines,
+    t,
+    translateInstruction,
+    translateFrequency,
+    translateTimeOfDay,
+  } = useCare();
 
   const [isLoading, setIsLoading] = useState(false);
   const [scanResult, setScanResult] = useState<PrescriptionScanResult | null>(null);
@@ -296,11 +302,11 @@ export const PrescriptionUploader: React.FC = () => {
                     </div>
 
                     <div className="text-sm font-semibold text-slate-600 mt-1">
-                      {med.frequency} • {med.time}
+                      {translateFrequency(med.frequency)} • {translateTimeOfDay(med.time)}
                     </div>
 
                     <p className="text-base text-slate-700 mt-2 bg-white p-2.5 rounded-lg border border-zinc-200">
-                      <span className="font-medium text-slate-500">Instructions:</span> {med.instructions}
+                      <span className="font-medium text-slate-500">{t('directions')}:</span> {translateInstruction(med.instructions)}
                     </p>
                   </div>
                 </div>

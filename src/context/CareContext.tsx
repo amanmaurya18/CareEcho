@@ -20,8 +20,25 @@ import {
 } from '@/lib/mockData';
 import { soundEffects, speakText } from '@/lib/audio';
 import { useSession } from 'next-auth/react';
+import {
+  getTranslation,
+  TranslationKey,
+  translateInstruction,
+  translatePurpose,
+  translateFrequency,
+  translateForm,
+  translateTimeOfDay,
+  translateCaregiverName,
+} from '@/lib/translations';
 
 interface CareContextType {
+  t: (key: TranslationKey, params?: Record<string, string | number>) => string;
+  translateInstruction: (instruction: string) => string;
+  translatePurpose: (purpose?: string) => string;
+  translateFrequency: (frequency?: string) => string;
+  translateForm: (form?: string) => string;
+  translateTimeOfDay: (timeOfDay: string) => string;
+  translateCaregiverName: (name: string) => string;
   medications: Medication[];
   adherenceLogs: AdherenceLog[];
   voiceLogs: VoiceCheckIn[];
@@ -192,12 +209,11 @@ export const CareProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setActiveAlarmMedication(med);
     soundEffects.startAlarm();
 
-    let spoken = `Attention ${patientName.split(' ')[0]}. It is time to take your ${med.name} ${med.dosage}. Please take your medicine now with water.`;
-    if (language === 'hi-IN') {
-      spoken = `ध्यान दें ${patientName.split(' ')[0]}। आपकी दवा ${med.name} ${med.dosage} का समय हो चुका है। कृपया अपनी दवा पानी के साथ लें।`;
-    } else if (language === 'es-ES') {
-      spoken = `Atención ${patientName.split(' ')[0]}. Es hora de tomar su ${med.name} ${med.dosage}. Por favor tome su medicina con agua.`;
-    }
+    const spoken = getTranslation(language, 'alarmSpoken', {
+      name: patientName.split(' ')[0],
+      med: med.name,
+      dosage: med.dosage,
+    });
     speakText(spoken, language, voiceGender).catch(() => {});
   };
 
@@ -274,6 +290,28 @@ export const CareProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const timer = setInterval(checkOverdue, 10000);
     return () => clearInterval(timer);
   }, [medications, activeAlarmMedication, snoozedMeds, dismissedMeds, isLoaded, session, language, voiceGender]);
+
+  // Load global/guest settings immediately on mount (works before sign-in as well)
+  useEffect(() => {
+    try {
+      const storedSettings = localStorage.getItem(STORAGE_KEYS.SETTINGS);
+      if (storedSettings) {
+        const parsed = JSON.parse(storedSettings);
+        if (parsed.language) setLanguageState(parsed.language);
+        if (typeof parsed.highContrast === 'boolean') {
+          setHighContrast(parsed.highContrast);
+          if (parsed.highContrast) {
+            document.documentElement.classList.add('high-contrast');
+          }
+        }
+        if (parsed.caregiverName) setCaregiverName(parsed.caregiverName);
+        if (parsed.caregiverPhone) setCaregiverPhone(parsed.caregiverPhone);
+        if (parsed.voiceGender) setVoiceGender(parsed.voiceGender);
+      }
+    } catch (e) {
+      console.error('Failed to load initial settings:', e);
+    }
+  }, []);
 
   // Load per-user data when session is established or changed
   useEffect(() => {
@@ -415,13 +453,51 @@ export const CareProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } else {
         document.documentElement.classList.remove('high-contrast');
       }
+      try {
+        const current = localStorage.getItem(STORAGE_KEYS.SETTINGS);
+        const parsed = current ? JSON.parse(current) : {};
+        parsed.highContrast = next;
+        localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(parsed));
+      } catch (e) {
+        console.error('Failed to persist high contrast:', e);
+      }
       return next;
     });
   };
 
   const setLanguage = (lang: SupportedLanguage) => {
     setLanguageState(lang);
+    try {
+      // 1. Immediately save to global settings so it persists on Login / landing page
+      const current = localStorage.getItem(STORAGE_KEYS.SETTINGS);
+      const parsed = current ? JSON.parse(current) : {};
+      parsed.language = lang;
+      localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(parsed));
+
+      // 2. Also save to user-specific settings if authenticated
+      if (!isDemoUser && userIdentifier) {
+        const userKey = getUserStorageKey(STORAGE_KEYS.SETTINGS, userIdentifier);
+        const userCur = localStorage.getItem(userKey);
+        const userParsed = userCur ? JSON.parse(userCur) : {};
+        userParsed.language = lang;
+        localStorage.setItem(userKey, JSON.stringify(userParsed));
+      }
+    } catch (e) {
+      console.error('Failed to persist language setting:', e);
+    }
   };
+
+  // Translation helper functions
+  const t = (key: TranslationKey, params?: Record<string, string | number>) => {
+    return getTranslation(language, key, params);
+  };
+
+  const translateInstructionText = (inst: string) => translateInstruction(inst, language);
+  const translatePurposeText = (pur?: string) => translatePurpose(pur, language);
+  const translateFrequencyText = (freq?: string) => translateFrequency(freq, language);
+  const translateFormText = (frm?: string) => translateForm(frm, language);
+  const translateTimeOfDayText = (tod: string) => translateTimeOfDay(tod, language);
+  const translateCaregiverNameText = (cgName: string) => translateCaregiverName(cgName, language);
 
   const updateCaregiverContact = (name: string, phone: string) => {
     setCaregiverName(name);
@@ -722,6 +798,13 @@ export const CareProvider: React.FC<{ children: React.ReactNode }> = ({ children
   return (
     <CareContext.Provider
       value={{
+        t,
+        translateInstruction: translateInstructionText,
+        translatePurpose: translatePurposeText,
+        translateFrequency: translateFrequencyText,
+        translateForm: translateFormText,
+        translateTimeOfDay: translateTimeOfDayText,
+        translateCaregiverName: translateCaregiverNameText,
         medications,
         adherenceLogs,
         voiceLogs,

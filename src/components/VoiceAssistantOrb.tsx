@@ -32,7 +32,7 @@ interface SpeechRecognitionInstance {
 }
 
 export const VoiceAssistantOrb: React.FC = () => {
-  const { language, addVoiceCheckIn, nextMedication, patientName, voiceGender, medications } = useCare();
+  const { t, language, addVoiceCheckIn, nextMedication, patientName, voiceGender, medications } = useCare();
 
   const [isOpen, setIsOpen] = useState(false);
   const [isListening, setIsListening] = useState(false);
@@ -151,8 +151,8 @@ export const VoiceAssistantOrb: React.FC = () => {
       await speakText(reply, language, voiceGender);
       setIsSpeaking(false);
     } catch (e) {
-      // Local graceful fallback
-      const fallbackReply = `Hello ${patientName.split(' ')[0]}! Everything is on schedule today. Please take your time and rest well.`;
+      // Local graceful fallback in selected language
+      const fallbackReply = t('fallbackCompanionReply', { name: patientName.split(' ')[0] });
       setResponseText(fallbackReply);
       addVoiceCheckIn(queryText, fallbackReply, 'good');
       setIsSpeaking(true);
@@ -211,7 +211,7 @@ export const VoiceAssistantOrb: React.FC = () => {
 
           <div className="relative flex items-center gap-2">
             <Mic className="w-6 h-6 sm:w-8 sm:h-8" />
-            <span className="hidden sm:inline font-bold text-base pr-1">Tap to Talk</span>
+            <span className="hidden sm:inline font-bold text-base pr-1">{t('tapToTalk')}</span>
           </div>
         </button>
       </div>
@@ -244,10 +244,10 @@ export const VoiceAssistantOrb: React.FC = () => {
                   <Sparkles className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
                 <div className="text-left min-w-0">
-                  <h3 className="text-lg sm:text-2xl font-bold text-slate-900 truncate">CareEcho Voice Companion</h3>
+                  <h3 className="text-lg sm:text-2xl font-bold text-slate-900 truncate">{t('voiceCompanionTitle')}</h3>
                   <div className="flex items-center gap-1.5 mt-0.5 sm:mt-1 flex-wrap">
                     <span className="inline-flex items-center gap-1 text-[11px] sm:text-xs font-semibold px-2 py-0.5 rounded-full bg-sage-50 text-sage-800 border border-sage-200">
-                      For <strong className="font-bold">{patientName.split(' ')[0]}</strong>
+                      {t('forPatient', { name: patientName.split(' ')[0] })}
                     </span>
                     <span className="text-xs font-semibold text-slate-600">
                       {language === 'hi-IN'
@@ -273,7 +273,7 @@ export const VoiceAssistantOrb: React.FC = () => {
                         : 'English'}
                     </span>
                     <span className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200">
-                      <span>🌸</span> Female Voice
+                      <span>🌸</span> {t('femaleVoice')}
                     </span>
                   </div>
                 </div>
@@ -288,7 +288,7 @@ export const VoiceAssistantOrb: React.FC = () => {
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-sage-50 hover:bg-sage-100 text-sage-800 text-xs font-bold rounded-xl border border-sage-200 transition-all shrink-0 active:scale-95 shadow-xs"
                 >
                   <Volume2 className="w-3.5 h-3.5 text-sage-600" />
-                  <span>Greet {patientName.split(' ')[0]}</span>
+                  <span>{t('greetPatient', { name: patientName.split(' ')[0] })}</span>
                 </button>
               </div>
             </div>
@@ -324,12 +324,12 @@ export const VoiceAssistantOrb: React.FC = () => {
               <div className="mt-4 text-center">
                 <span className="text-lg font-bold text-slate-800">
                   {isListening
-                    ? 'Listening... Speak clearly'
+                    ? t('listeningSpeakClearly')
                     : isThinking
-                    ? 'CareEcho is thinking...'
+                    ? t('careEchoThinking')
                     : isSpeaking
-                    ? 'Speaking response...'
-                    : 'Tap the circle to speak'}
+                    ? t('speakingResponse')
+                    : t('tapToSpeak')}
                 </span>
                 {isListening && (
                   <div className="mt-2">
@@ -337,7 +337,7 @@ export const VoiceAssistantOrb: React.FC = () => {
                       onClick={stopListeningAndProcess}
                       className="px-4 py-1.5 bg-sage-700 text-white text-sm font-semibold rounded-full hover:bg-sage-800"
                     >
-                      Done Speaking ✓
+                      {t('doneSpeaking')}
                     </button>
                   </div>
                 )}
@@ -350,7 +350,7 @@ export const VoiceAssistantOrb: React.FC = () => {
                 {transcript && (
                   <div>
                     <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                      You said:
+                      {t('youSaid')}
                     </span>
                     <p className="text-lg font-semibold text-slate-900 mt-0.5">
                       "{transcript}"
@@ -383,7 +383,7 @@ export const VoiceAssistantOrb: React.FC = () => {
                 type="text"
                 value={textInput}
                 onChange={(e) => setTextInput(e.target.value)}
-                placeholder="Or type a question (e.g. Have I taken my pills?)..."
+                placeholder={t('typeQuestionPlaceholder')}
                 className="flex-1 min-h-tap px-4 py-2 rounded-xl border border-zinc-300 bg-zinc-50 text-slate-900 text-base focus:ring-2 focus:ring-sage-600 focus:outline-hidden"
               />
               <button

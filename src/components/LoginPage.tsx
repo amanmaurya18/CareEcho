@@ -25,7 +25,7 @@ interface LoginPageProps {
 }
 
 export const LoginPage: React.FC<LoginPageProps> = ({ callbackUrl = '/' }) => {
-  const { language, setLanguage, highContrast, toggleHighContrast } = useCare();
+  const { t, language, setLanguage, highContrast, toggleHighContrast } = useCare();
   const [activeTab, setActiveTab] = useState<'quick' | 'oauth'>('quick');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -127,7 +127,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ callbackUrl = '/' }) => {
             }`}
           >
             <Eye className="w-4 h-4 shrink-0" />
-            <span className="hidden sm:inline">Contrast</span>
+            <span className="hidden sm:inline">{t('contrast')}</span>
           </button>
 
           {/* Language Selector */}
@@ -161,15 +161,15 @@ export const LoginPage: React.FC<LoginPageProps> = ({ callbackUrl = '/' }) => {
         <div className="text-center max-w-2xl mx-auto mb-6 sm:mb-8 animate-fadeIn">
           <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-sage-100 text-sage-800 border border-sage-200 text-xs sm:text-sm font-bold shadow-xs mb-2.5 sm:mb-3">
             <Lock className="w-3.5 h-3.5 text-sage-600 shrink-0" />
-            <span>Secure Elder & Family Health Portal</span>
+            <span>{t('securePortal')}</span>
           </div>
 
           <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
-            Welcome to CareEcho
+            {t('welcomeTitle')}
           </h1>
 
           <p className="text-sm sm:text-lg text-slate-600 font-medium mt-2 sm:mt-3 leading-relaxed">
-            Please sign in to unlock your personalized medication timeline, real-time voice companion, prescription scanner, and family caregiver updates.
+            {t('welcomeSubtitle')}
           </p>
         </div>
 
@@ -188,7 +188,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ callbackUrl = '/' }) => {
               }`}
             >
               <Sparkles className="w-4 h-4 text-amber-500" />
-              <span>Instant Demo Access</span>
+              <span>{t('instantDemoAccess')}</span>
             </button>
 
             <button
@@ -212,7 +212,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ callbackUrl = '/' }) => {
               <div className="flex-1">
                 <p className="font-bold">{errorMessage}</p>
                 <p className="text-xs text-amber-700 mt-0.5">
-                  Tip: Use the <strong>Instant Demo Access</strong> tab to explore immediately.
+                  Tip: Use the <strong>{t('instantDemoAccess')}</strong> tab to explore immediately.
                 </p>
               </div>
             </div>
@@ -222,7 +222,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ callbackUrl = '/' }) => {
           {activeTab === 'quick' && (
             <div className="space-y-4">
               <p className="text-xs sm:text-sm text-slate-600 font-medium">
-                Explore CareEcho with a single click — pre-loaded with Margaret Vance&apos;s senior companion timeline:
+                {t('signInSub')}
               </p>
 
               {/* Single Senior Companion Demo Card */}
@@ -247,7 +247,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ callbackUrl = '/' }) => {
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
                       <h3 className="text-sm sm:text-lg font-extrabold text-slate-900 group-hover:text-sage-800 truncate">
-                        Launch Demo — Margaret
+                        {t('launchDemo')}
                       </h3>
                       <span className="text-[9px] sm:text-xs font-bold px-1.5 sm:px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
                         1-Click Demo
@@ -307,7 +307,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ callbackUrl = '/' }) => {
                     d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
                   />
                 </svg>
-                <span>Continue with Google</span>
+                <span>{t('continueWithGoogle')}</span>
               </button>
 
               <div className="pt-2 text-center">
@@ -318,7 +318,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ callbackUrl = '/' }) => {
                     onClick={() => setActiveTab('quick')}
                     className="text-sage-700 font-bold hover:underline"
                   >
-                    Instant Demo
+                    {t('instantDemoAccess')}
                   </button>
                 </span>
               </div>
@@ -329,7 +329,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ callbackUrl = '/' }) => {
           <div className="mt-6 pt-4 border-t border-zinc-100 flex items-center justify-between text-[11px] sm:text-xs text-slate-500 font-medium">
             <div className="flex items-center gap-1.5">
               <ShieldCheck className="w-4 h-4 text-sage-600" />
-              <span>HIPAA-aligned data privacy</span>
+              <span>{t('secureHIPAA')}</span>
             </div>
             <div className="flex items-center gap-1.5">
               <CheckCircle2 className="w-4 h-4 text-emerald-600" />
@@ -345,9 +345,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ callbackUrl = '/' }) => {
               <Activity className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="text-sm font-bold text-slate-900">Voice Companion</h4>
+              <h4 className="text-sm font-bold text-slate-900">{t('voiceReminders')}</h4>
               <p className="text-xs text-slate-600 mt-0.5">
-                Talk naturally in 11 languages with our responsive AI orb.
+                {t('voiceDesc')}
               </p>
             </div>
           </div>

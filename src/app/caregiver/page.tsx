@@ -12,7 +12,7 @@ import { useCare } from '@/context/CareContext';
 import { ShieldCheck, Heart, Users } from 'lucide-react';
 
 export default function CaregiverPortalPage() {
-  const { caregiverName, patientName } = useCare();
+  const { t, caregiverName, patientName } = useCare();
   const [isSosOpen, setIsSosOpen] = useState(false);
 
   return (
@@ -35,11 +35,11 @@ export default function CaregiverPortalPage() {
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-xl sm:text-3xl font-extrabold text-slate-900">
-                  Caregiver Monitoring Portal
+                  {t('caregiverPortalTitle')}
                 </h1>
               </div>
               <p className="text-xs sm:text-base text-slate-600 font-medium mt-0.5">
-                Monitoring <span className="font-bold text-slate-900">{patientName}</span> • Logged in as <span className="font-bold text-slate-900">{caregiverName}</span>
+                {t('monitoring')} <span className="font-bold text-slate-900">{patientName}</span> • {t('loggedInAs')} <span className="font-bold text-slate-900">{caregiverName}</span>
               </p>
             </div>
           </div>

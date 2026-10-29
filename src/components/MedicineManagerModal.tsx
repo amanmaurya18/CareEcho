@@ -22,6 +22,11 @@ export const MedicineManagerModal: React.FC = () => {
     deleteMedication,
     resetToDefaults,
     openAddMedicine,
+    t,
+    translateInstruction,
+    translatePurpose,
+    translateTimeOfDay,
+    translateForm,
   } = useCare();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -150,7 +155,7 @@ export const MedicineManagerModal: React.FC = () => {
                 <td className="py-3.5 px-4">
                   <div className="font-bold text-slate-900">{med.name}</div>
                   <div className="text-xs text-slate-500 capitalize">
-                    {med.form || 'tablet'}{med.purpose ? ` • ${med.purpose}` : ''}
+                    {translateForm(med.form || 'tablet')}{med.purpose ? ` • ${translatePurpose(med.purpose)}` : ''}
                   </div>
                 </td>
                 <td className="py-3.5 px-4 font-semibold text-sage-700">
@@ -160,10 +165,10 @@ export const MedicineManagerModal: React.FC = () => {
                   <div className="font-medium text-slate-800">
                     {med.scheduledTime}
                   </div>
-                  <div className="text-xs text-slate-500">{med.timeOfDay}</div>
+                  <div className="text-xs text-slate-500">{translateTimeOfDay(med.timeOfDay)}</div>
                 </td>
                 <td className="py-3.5 px-4 hidden md:table-cell text-slate-600 text-sm max-w-xs">
-                  {med.instructions}
+                  {translateInstruction(med.instructions)}
                 </td>
                 <td className="py-3.5 px-4 text-right">
                   <div className="flex items-center justify-end gap-2">

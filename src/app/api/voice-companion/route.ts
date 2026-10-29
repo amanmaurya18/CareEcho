@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { Medication } from '@/lib/types';
+import { Medication, SupportedLanguage } from '@/lib/types';
+import {
+  translateInstruction,
+  translatePurpose,
+  translateTimeOfDay,
+  translateForm,
+} from '@/lib/translations';
 
 interface VoiceCompanionRequestBody {
   query?: string;
@@ -23,11 +29,12 @@ export async function POST(req: NextRequest) {
 
     const apiKey = process.env.GEMINI_API_KEY;
     const firstName = patientName.split(' ')[0] || 'there';
+    const currentLang = (language as SupportedLanguage) || 'en-US';
 
-    // Format active medication list for AI context
+    // Format active medication list for AI context in the requested language
     const medsSummary = medications.length > 0
       ? medications.map((m, idx) =>
-          `${idx + 1}. ${m.name} (${m.dosage}, ${m.form || 'tablet'}): Scheduled at ${m.scheduledTime} (${m.timeOfDay}). Status: ${m.status.toUpperCase()}. Instructions: "${m.instructions}". Condition/Purpose: "${m.purpose || 'Health maintenance'}".`
+          `${idx + 1}. ${m.name} (${m.dosage}, ${translateForm(m.form, currentLang)}): Scheduled at ${m.scheduledTime} (${translateTimeOfDay(m.timeOfDay, currentLang)}). Status: ${m.status === 'taken' ? 'TAKEN' : 'PENDING'}. Instructions: "${translateInstruction(m.instructions, currentLang)}". Condition/Purpose: "${translatePurpose(m.purpose, currentLang) || 'Health maintenance'}".`
         ).join('\n')
       : `1. Upcoming dose: ${nextMedication || 'Daily health regimen'}`;
 
@@ -63,8 +70,11 @@ CRITICAL INSTRUCTIONS:
    - Speak in a very warm, comforting, natural human tone — like a caring personal nurse speaking directly to them.
    - Do NOT sound robotic, repetitive, or like you are reading a rigid database.
    - Keep answers concise (1 to 2 clear sentences for elderly audio listening).
-   - Respond in the requested language (${language}).
-   - Do NOT use markdown symbols, asterisks, bullet points, or complex medical jargon.`;
+   - Do NOT use markdown symbols, asterisks, bullet points, or complex medical jargon.
+4. STRICT SINGLE LANGUAGE MANDATE (CRITICAL):
+   - You MUST formulate your entire response 100% in the requested language: ${language}.
+   - NEVER output mixed-language text like "निर्देश: Take with a full glass of water after food" or "Instrucciones: Take 1 tablet".
+   - Every single word and instruction MUST be purely in ${language}.`;
 
         const result = await model.generateContent(prompt);
         const reply = result.response.text().trim();
@@ -256,6 +266,19 @@ function generateNaturalResponse({
     return `I checked your active prescription list, and ${drugCap} is not listed in your scheduled medications. Your active medicines are ${activeNames}. Please consult your doctor or caregiver before taking anything new.`;
   }
 
+  // Determine typed target language
+  const targetLang: SupportedLanguage =
+    lang.startsWith('hi') ? 'hi-IN' :
+    lang.startsWith('es') ? 'es-ES' :
+    lang.startsWith('ta') ? 'ta-IN' :
+    lang.startsWith('te') ? 'te-IN' :
+    lang.startsWith('bn') ? 'bn-IN' :
+    lang.startsWith('mr') ? 'mr-IN' :
+    lang.startsWith('gu') ? 'gu-IN' :
+    lang.startsWith('kn') ? 'kn-IN' :
+    lang.startsWith('ml') ? 'ml-IN' :
+    lang.startsWith('pa') ? 'pa-IN' : 'en-US';
+
   // 2. Did the user ask about a specific medicine from their list?
   const matchedMed = medications.find(matchesMed);
 
@@ -265,6 +288,10 @@ function generateNaturalResponse({
     const isAskingTaken = q.includes('did i take') || q.includes('have i taken') || q.includes('taken') || q.includes('status') || q.includes('ली') || q.includes('ले ली') || q.includes('ya tomé');
     const isAskingFood = q.includes('food') || q.includes('water') || q.includes('meal') || q.includes('breakfast') || q.includes('dinner') || q.includes('खाना') || q.includes('पानी') || q.includes('comida') || q.includes('agua');
 
+    const localizedInstructions = translateInstruction(matchedMed.instructions, targetLang);
+    const localizedTimeOfDay = translateTimeOfDay(matchedMed.timeOfDay, targetLang);
+    const localizedPurpose = translatePurpose(matchedMed.purpose, targetLang);
+
     // Hindi responses for specific med
     if (lang.startsWith('hi')) {
       if (isAskingTaken) {
@@ -273,12 +300,12 @@ function generateNaturalResponse({
           : `नहीं ${patientName}, आपकी ${matchedMed.name} ${matchedMed.dosage} अभी बाकी है। इसका समय ${matchedMed.scheduledTime} है।`;
       }
       if (isAskingTiming) {
-        return `आपकी ${matchedMed.name} ${matchedMed.dosage} का समय ${matchedMed.scheduledTime} (${matchedMed.timeOfDay}) है। ${matchedMed.instructions}`;
+        return `आपकी ${matchedMed.name} ${matchedMed.dosage} का समय ${matchedMed.scheduledTime} (${localizedTimeOfDay}) है। ${localizedInstructions}`;
       }
       if (isAskingPurpose) {
-        return `${matchedMed.name} आपकी ${matchedMed.purpose || 'सेहत'} के लिए निर्धारित है। इसे ${matchedMed.instructions} लेना है।`;
+        return `${matchedMed.name} आपकी ${localizedPurpose || 'सेहत'} के लिए निर्धारित है। निर्देश: ${localizedInstructions}`;
       }
-      return `${matchedMed.name} (${matchedMed.dosage}) का समय ${matchedMed.scheduledTime} है। निर्देश: ${matchedMed.instructions}। वर्तमान स्थिति: ${matchedMed.status === 'taken' ? 'ली जा चुकी है' : 'बाकी है'}।`;
+      return `${matchedMed.name} (${matchedMed.dosage}) का समय ${matchedMed.scheduledTime} है। निर्देश: ${localizedInstructions}। वर्तमान स्थिति: ${matchedMed.status === 'taken' ? 'ली जा चुकी है' : 'बाकी है'}।`;
     }
 
     // Spanish responses for specific med
@@ -289,30 +316,30 @@ function generateNaturalResponse({
           : `Aún no, ${patientName}. Su ${matchedMed.name} ${matchedMed.dosage} está pendiente para las ${matchedMed.scheduledTime}.`;
       }
       if (isAskingTiming) {
-        return `Su ${matchedMed.name} ${matchedMed.dosage} está programado para las ${matchedMed.scheduledTime} (${matchedMed.timeOfDay}). ${matchedMed.instructions}`;
+        return `Su ${matchedMed.name} ${matchedMed.dosage} está programado para las ${matchedMed.scheduledTime} (${localizedTimeOfDay}). ${localizedInstructions}`;
       }
       if (isAskingPurpose) {
-        return `${matchedMed.name} está recetado para ${matchedMed.purpose || 'su salud'}. Tome ${matchedMed.dosage}: ${matchedMed.instructions}.`;
+        return `${matchedMed.name} está recetado para ${localizedPurpose || 'su salud'}. Instrucciones: ${localizedInstructions}`;
       }
-      return `${matchedMed.name} (${matchedMed.dosage}) está programado para las ${matchedMed.scheduledTime}. Instrucciones: ${matchedMed.instructions}.`;
+      return `${matchedMed.name} (${matchedMed.dosage}) está programado para las ${matchedMed.scheduledTime}. Instrucciones: ${localizedInstructions}.`;
     }
 
     // English responses for specific med
     if (isAskingTaken) {
       return matchedMed.status === 'taken'
         ? `Yes, ${patientName}, you've already taken your ${matchedMed.name} for today! Great job staying on track.`
-        : `Not yet, ${patientName}. Your ${matchedMed.name} ${matchedMed.dosage} is still pending for ${matchedMed.scheduledTime}. Remember: ${matchedMed.instructions}`;
+        : `Not yet, ${patientName}. Your ${matchedMed.name} ${matchedMed.dosage} is still pending for ${matchedMed.scheduledTime}. Remember: ${localizedInstructions}`;
     }
     if (isAskingTiming) {
-      return `Your ${matchedMed.name} ${matchedMed.dosage} is scheduled for ${matchedMed.scheduledTime} in the ${matchedMed.timeOfDay}. ${matchedMed.instructions} (Status: ${matchedMed.status}).`;
+      return `Your ${matchedMed.name} ${matchedMed.dosage} is scheduled for ${matchedMed.scheduledTime} in the ${localizedTimeOfDay}. ${localizedInstructions} (Status: ${matchedMed.status}).`;
     }
     if (isAskingPurpose) {
-      return `${matchedMed.name} is prescribed for ${matchedMed.purpose || 'your ongoing health care'}. You take ${matchedMed.dosage} — ${matchedMed.instructions}.`;
+      return `${matchedMed.name} is prescribed for ${localizedPurpose || 'your ongoing health care'}. You take ${matchedMed.dosage} — ${localizedInstructions}.`;
     }
     if (isAskingFood) {
-      return `For ${matchedMed.name} ${matchedMed.dosage}: ${matchedMed.instructions} Scheduled at ${matchedMed.scheduledTime}.`;
+      return `For ${matchedMed.name} ${matchedMed.dosage}: ${localizedInstructions} Scheduled at ${matchedMed.scheduledTime}.`;
     }
-    return `${matchedMed.name} ${matchedMed.dosage} is scheduled for ${matchedMed.scheduledTime} (${matchedMed.timeOfDay}). Instructions: ${matchedMed.instructions} (Currently ${matchedMed.status}).`;
+    return `${matchedMed.name} ${matchedMed.dosage} is scheduled for ${matchedMed.scheduledTime} (${localizedTimeOfDay}). Instructions: ${localizedInstructions} (Currently ${matchedMed.status}).`;
   }
 
   // 3. Asking about upcoming / next dose
@@ -326,9 +353,11 @@ function generateNaturalResponse({
     }
 
     const next = pendingMeds[0];
-    if (lang.startsWith('hi')) return `आपकी अगली दवा ${next.name} ${next.dosage} है, जो ${next.scheduledTime} (${next.timeOfDay}) के लिए निर्धारित है। ${next.instructions}`;
-    if (lang.startsWith('es')) return `Su próximo medicamento es ${next.name} ${next.dosage} a las ${next.scheduledTime} (${next.timeOfDay}). ${next.instructions}`;
-    return `Your next upcoming medicine is ${next.name} ${next.dosage} scheduled for ${next.scheduledTime} (${next.timeOfDay}). ${next.instructions}`;
+    const nextInst = translateInstruction(next.instructions, targetLang);
+    const nextSlot = translateTimeOfDay(next.timeOfDay, targetLang);
+    if (lang.startsWith('hi')) return `आपकी अगली दवा ${next.name} ${next.dosage} है, जो ${next.scheduledTime} (${nextSlot}) के लिए निर्धारित है। ${nextInst}`;
+    if (lang.startsWith('es')) return `Su próximo medicamento es ${next.name} ${next.dosage} a las ${next.scheduledTime} (${nextSlot}). ${nextInst}`;
+    return `Your next upcoming medicine is ${next.name} ${next.dosage} scheduled for ${next.scheduledTime} (${nextSlot}). ${nextInst}`;
   }
 
   // 4. Asking about pending / remaining doses

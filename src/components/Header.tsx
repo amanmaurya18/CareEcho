@@ -20,6 +20,8 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ onOpenSos }) => {
   const {
+    t,
+    translateCaregiverName,
     language,
     setLanguage,
     highContrast,
@@ -34,16 +36,21 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSos }) => {
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
-      setCurrentTime(
-        now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      );
-      setCurrentDate(
-        now.toLocaleDateString([], {
-          weekday: 'long',
-          month: 'short',
-          day: 'numeric',
-        })
-      );
+      try {
+        setCurrentTime(
+          now.toLocaleTimeString(language, { hour: '2-digit', minute: '2-digit' })
+        );
+        setCurrentDate(
+          now.toLocaleDateString(language, {
+            weekday: 'long',
+            month: 'short',
+            day: 'numeric',
+          })
+        );
+      } catch {
+        setCurrentTime(now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+        setCurrentDate(now.toLocaleDateString([], { weekday: 'long', month: 'short', day: 'numeric' }));
+      }
     };
 
     updateTime();
@@ -60,7 +67,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSos }) => {
     }
 
     return () => clearInterval(timer);
-  }, []);
+  }, [language]);
 
   return (
     <header className="w-full bg-[#FFFFFF] border-b border-zinc-200 card-contrast px-3 py-2.5 sm:px-6 sm:py-4">
@@ -78,12 +85,12 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSos }) => {
                   CareEcho
                 </span>
                 <span className="text-[10px] sm:text-xs font-bold px-1.5 py-0.5 rounded-full bg-sage-100 text-sage-800 border border-sage-200 shrink-0">
-                  Companion
+                  {t('companion')}
                 </span>
               </div>
               <div className="flex items-center gap-1 text-[11px] sm:text-sm text-slate-600 truncate">
                 <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
-                <span className="truncate">Connected to {caregiverName.split(' ')[0]}</span>
+                <span className="truncate">{t('connectedTo', { name: translateCaregiverName(caregiverName.split(' ')[0]) })}</span>
               </div>
             </div>
           </div>
@@ -97,7 +104,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSos }) => {
               className="min-h-tap px-3 py-1.5 bg-sos-50 hover:bg-sos-100 text-sos-700 hover:text-sos-800 border-2 border-sos-600 rounded-xl font-extrabold text-xs sm:text-sm flex items-center gap-1 shadow-sm active:scale-95 shrink-0"
             >
               <AlertTriangle className="w-3.5 h-3.5 text-sos-600 fill-sos-600" />
-              <span>SOS</span>
+              <span>{t('sos')}</span>
             </button>
           </div>
         </div>
@@ -110,7 +117,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSos }) => {
               <span>{currentTime || '10:00 AM'}</span>
             </div>
             <div className="text-[11px] sm:text-base font-medium text-slate-600 truncate">
-              {currentDate || 'Today'}
+              {currentDate || t('today')}
             </div>
           </div>
 
@@ -134,7 +141,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSos }) => {
               }`}
             >
               <Eye className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Contrast</span>
+              <span className="hidden sm:inline">{t('contrast')}</span>
             </button>
 
             {/* Language Switcher */}
@@ -171,7 +178,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSos }) => {
               className="hidden md:flex min-h-tap min-w-tap px-4 py-2 bg-sos-50 hover:bg-sos-100 text-sos-700 hover:text-sos-800 border-2 border-sos-600 rounded-xl font-bold text-base sm:text-lg items-center gap-2 shadow-sm transition-all transform active:scale-95"
             >
               <AlertTriangle className="w-5 h-5 text-sos-600 fill-sos-600" />
-              <span>SOS</span>
+              <span>{t('sos')}</span>
             </button>
           </div>
         </div>

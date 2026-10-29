@@ -7,6 +7,10 @@ import { Check, Volume2, Pill, Clock, Sparkles, AlertCircle, Droplets, Wind, Syr
 
 export const CurrentDoseBanner: React.FC = () => {
   const {
+    t,
+    translateInstruction,
+    translatePurpose,
+    translateTimeOfDay,
     medications,
     nextMedication,
     markAsTaken,
@@ -26,17 +30,17 @@ export const CurrentDoseBanner: React.FC = () => {
           <Pill className="w-8 h-8" />
         </div>
         <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-2">
-          Ready to Set Up Your Schedule
+          {t('readySchedule')}
         </h2>
         <p className="text-base sm:text-lg text-slate-600 max-w-xl mx-auto mb-6 leading-relaxed">
-          {patientName.split(' ')[0]}, you don&apos;t have any medications scheduled yet. Click below to add your medicine, dosage, and times to start receiving automated spoken reminders.
+          {t('readyScheduleDesc', { name: patientName.split(' ')[0] })}
         </p>
         <button
           onClick={() => openAddMedicine()}
           className="min-h-tap px-6 py-3 bg-sage-600 hover:bg-sage-700 text-white font-bold text-base rounded-2xl shadow-md shadow-sage-600/20 inline-flex items-center gap-2.5 active:scale-95 transition-all"
         >
           <Pill className="w-5 h-5" />
-          <span>+ Add Your First Medicine</span>
+          <span>{t('addFirstMedicine')}</span>
         </button>
       </div>
     );
@@ -50,10 +54,10 @@ export const CurrentDoseBanner: React.FC = () => {
           <Sparkles className="w-8 h-8 text-sage-600" />
         </div>
         <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-2">
-          All Medications Taken for Today!
+          {t('allTakenDay')}
         </h2>
         <p className="text-lg text-slate-700 max-w-xl mx-auto">
-          Wonderful job, {patientName.split(' ')[0]}! You have completed all scheduled doses. Rest well and stay hydrated.
+          {t('allTakenDayDesc', { name: patientName.split(' ')[0] })}
         </p>
       </div>
     );
@@ -80,13 +84,12 @@ export const CurrentDoseBanner: React.FC = () => {
   const handleReadAloud = async () => {
     soundEffects.playTap();
     setIsSpeaking(true);
-    let speechText = `Next medication: ${nextMedication.name}, dosage ${nextMedication.dosage}. Scheduled for ${nextMedication.scheduledTime}. Instructions: ${nextMedication.instructions}`;
-    
-    if (language === 'hi-IN') {
-      speechText = `अगली दवा: ${nextMedication.name}, खुराक ${nextMedication.dosage}। समय: ${nextMedication.scheduledTime}। निर्देश: ${nextMedication.instructions}`;
-    } else if (language === 'es-ES') {
-      speechText = `Próximo medicamento: ${nextMedication.name}, dosis ${nextMedication.dosage}. Programado para las ${nextMedication.scheduledTime}. Instrucciones: ${nextMedication.instructions}`;
-    }
+    const speechText = t('nextMedicationSpoken', {
+      name: nextMedication.name,
+      dosage: nextMedication.dosage,
+      time: nextMedication.scheduledTime,
+      instructions: translateInstruction(nextMedication.instructions),
+    });
 
     await speakText(speechText, language, voiceGender);
     setIsSpeaking(false);
@@ -113,12 +116,12 @@ export const CurrentDoseBanner: React.FC = () => {
                 : 'bg-amber-pendingBg text-amber-pending border border-amber-pendingBorder'
             }`}>
               {isOverdue ? <AlertCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-red-600 shrink-0" /> : <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />}
-              <span className="truncate">{isTaken ? 'Completed' : isOverdue ? `Time is Over (${nextMedication.scheduledTime})` : `Due at ${nextMedication.scheduledTime}`}</span>
+              <span className="truncate">{isTaken ? t('completed') : isOverdue ? t('timeIsOver', { time: nextMedication.scheduledTime }) : t('dueAt', { time: nextMedication.scheduledTime })}</span>
             </span>
 
             {nextMedication.purpose && (
               <span className="hidden sm:inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-zinc-100 text-slate-700 border border-zinc-200">
-                {nextMedication.purpose}
+                {translatePurpose(nextMedication.purpose)}
               </span>
             )}
           </div>
@@ -132,12 +135,12 @@ export const CurrentDoseBanner: React.FC = () => {
                 className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1 rounded-xl border border-red-300 bg-red-50 hover:bg-red-100 text-red-700 text-[11px] sm:text-xs font-bold transition-colors shadow-xs active:scale-95"
               >
                 <Bell className="w-3 h-3 sm:w-3.5 sm:h-3.5 animate-bounce shrink-0" />
-                <span>Test Alarm</span>
+                <span>{t('testOverdueAlarm')}</span>
               </button>
             )}
 
             <span className="text-xs sm:text-sm font-semibold text-slate-500">
-              {nextMedication.timeOfDay}
+              {translateTimeOfDay(nextMedication.timeOfDay)}
             </span>
           </div>
         </div>
@@ -163,7 +166,7 @@ export const CurrentDoseBanner: React.FC = () => {
             </h2>
 
             <p className="text-xs sm:text-lg font-medium text-slate-700 mt-1.5 sm:mt-2 bg-zinc-50 p-2 sm:p-3 rounded-xl border border-zinc-200 leading-relaxed">
-              💡 <span className="font-bold">Instructions:</span> {nextMedication.instructions}
+              💡 <span className="font-bold">{t('directions')}:</span> {translateInstruction(nextMedication.instructions)}
             </p>
           </div>
         </div>
@@ -182,7 +185,7 @@ export const CurrentDoseBanner: React.FC = () => {
             }`}
           >
             <Check className="w-5 h-5 sm:w-7 sm:h-7 stroke-[3] shrink-0" />
-            <span>{isTaken ? '✓ Taken Today' : 'Mark as Taken'}</span>
+            <span>{isTaken ? `✓ ${t('completed')}` : t('markAsTaken')}</span>
           </button>
 
           {/* Read Aloud Button */}
@@ -194,7 +197,7 @@ export const CurrentDoseBanner: React.FC = () => {
             }`}
           >
             <Volume2 className="w-5 h-5 sm:w-7 sm:h-7 text-slate-800 shrink-0" />
-            <span>{isSpeaking ? 'Speaking...' : 'Read Aloud'}</span>
+            <span>{isSpeaking ? t('listening') : t('listen')}</span>
           </button>
         </div>
 

@@ -12,17 +12,17 @@ import { TimeOfDay } from '@/lib/types';
 import { Sun, CloudSun, Sunset, Moon, Heart, Sparkles, CheckCircle2, Pencil, Check, Plus, Pill } from 'lucide-react';
 
 export default function SeniorCompanionPage() {
-  const { medications, patientName, setPatientName, openAddMedicine } = useCare();
+  const { t, medications, patientName, setPatientName, openAddMedicine } = useCare();
   const [isSosOpen, setIsSosOpen] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
   const [tempName, setTempName] = useState(patientName);
 
   // Group medications by time of day
   const timeSlots: { time: TimeOfDay; icon: React.ReactNode; label: string }[] = [
-    { time: 'Morning', icon: <Sun className="w-6 h-6 text-amber-500" />, label: 'Morning Medications' },
-    { time: 'Afternoon', icon: <CloudSun className="w-6 h-6 text-orange-500" />, label: 'Afternoon Medications' },
-    { time: 'Evening', icon: <Sunset className="w-6 h-6 text-indigo-500" />, label: 'Evening Medications' },
-    { time: 'Night', icon: <Moon className="w-6 h-6 text-blue-500" />, label: 'Bedtime & Night' },
+    { time: 'Morning', icon: <Sun className="w-6 h-6 text-amber-500" />, label: t('morningMedications') },
+    { time: 'Afternoon', icon: <CloudSun className="w-6 h-6 text-orange-500" />, label: t('afternoonMedications') },
+    { time: 'Evening', icon: <Sunset className="w-6 h-6 text-indigo-500" />, label: t('eveningMedications') },
+    { time: 'Night', icon: <Moon className="w-6 h-6 text-blue-500" />, label: t('bedtimeNight') },
   ];
 
   return (
@@ -66,13 +66,13 @@ export default function SeniorCompanionPage() {
                     className="px-3 py-1.5 bg-sage-600 hover:bg-sage-700 text-white rounded-xl text-xs font-bold flex items-center gap-1 shadow-sm active:scale-95 transition-all"
                   >
                     <Check className="w-3.5 h-3.5" />
-                    <span>Save</span>
+                    <span>{t('save')}</span>
                   </button>
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
                   <h1 className="text-xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-                    Good day, {patientName.split(' ')[0]} 👋
+                    {t('goodDay', { name: patientName.split(' ')[0] })}
                   </h1>
                   <button
                     onClick={() => {
@@ -89,7 +89,7 @@ export default function SeniorCompanionPage() {
               )}
             </div>
             <p className="text-xs sm:text-base text-slate-600 font-medium mt-0.5">
-              Here is your daily care schedule. Tap any button to mark your medicine as taken.
+              {t('dailyScheduleDesc')}
             </p>
           </div>
         </div>
@@ -102,10 +102,13 @@ export default function SeniorCompanionPage() {
           <div className="border-b border-zinc-200 pb-3 flex items-center justify-between gap-2.5">
             <div>
               <h2 className="text-lg sm:text-2xl font-bold text-slate-900 tracking-tight">
-                Today&apos;s Medication Timeline
+                {t('todaysTimeline')}
               </h2>
               <span className="text-xs sm:text-sm font-semibold text-slate-500">
-                {medications.filter((m) => m.status === 'taken').length} of {medications.length} taken
+                {t('takenCountOf', {
+                  taken: medications.filter((m) => m.status === 'taken').length,
+                  total: medications.length,
+                })}
               </span>
             </div>
 
@@ -114,8 +117,8 @@ export default function SeniorCompanionPage() {
               className="min-h-tap px-3 sm:px-4 py-2 bg-sage-600 hover:bg-sage-700 text-white rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 shadow-xs active:scale-95 transition-all shrink-0"
             >
               <Plus className="w-4 h-4 stroke-[2.5]" />
-              <span className="hidden sm:inline">Add Medication</span>
-              <span className="sm:hidden">Add Med</span>
+              <span className="hidden sm:inline">{t('addMedicine')}</span>
+              <span className="sm:hidden">{t('addMedicine')}</span>
             </button>
           </div>
 
@@ -126,9 +129,9 @@ export default function SeniorCompanionPage() {
                 <Pill className="w-6 h-6 sm:w-7 sm:h-7" />
               </div>
               <div>
-                <h3 className="text-base sm:text-lg font-bold text-slate-900">No Medications Scheduled Yet</h3>
+                <h3 className="text-base sm:text-lg font-bold text-slate-900">{t('readySchedule')}</h3>
                 <p className="text-xs sm:text-sm text-slate-500 max-w-md mx-auto mt-1">
-                  Add your morning, afternoon, or bedtime medicines to enable spoken voice reminders and dosage tracking.
+                  {t('readyScheduleDesc', { name: patientName.split(' ')[0] })}
                 </p>
               </div>
               <button
@@ -136,7 +139,7 @@ export default function SeniorCompanionPage() {
                 className="min-h-tap px-4 sm:px-5 py-2.5 bg-sage-600 hover:bg-sage-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-xs active:scale-95 transition-all inline-flex items-center gap-2"
               >
                 <Plus className="w-4 h-4" />
-                <span>+ Add Your First Medicine</span>
+                <span>{t('addFirstMedicine')}</span>
               </button>
             </div>
           )}
