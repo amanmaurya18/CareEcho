@@ -179,7 +179,7 @@ export const VoiceAssistantOrb: React.FC = () => {
       'mr-IN': `नमस्कार ${firstName}! तुम्ही लॉग इन आहात आणि मी तुमच्या औषधांच्या वेळापत्रकासह तयार आहे. आज तुम्हाला कसे वाटत आहे?`,
       'gu-IN': `નમસ્તે ${firstName}! તમે લોગ ઇન છો અને હું તમારી દવાઓના સમયપત્રક સાથે તૈયાર છું. આજે તમે કેવું અનુભવો છો?`,
       'kn-IN': `ನಮಸ್ಕಾರ ${firstName}! ನೀವು ಲಾಗಿನ್ ಆಗಿದ್ದೀರಿ ಮತ್ತು ನಿಮ್ಮ ಔಷಧಿ ವೇಳಾಪಟ್ಟಿ ಸಿದ್ಧವಾಗಿದೆ. ಇಂದು ನಿಮಗೆ ಹೇಗನಿಸುತ್ತಿದೆ?`,
-      'ml-IN': `നമസ്കാരം ${firstName}! നിങ്ങൾ ലോഗിൻ ചെയ്തിരിക്കുന്നു, നിങ്ങളുടെ മരുന്ന് ഷെഡ്യൂൾ തയ്യാറാണ്. ಇಂದು ನಿಮಗೆ ಹೇಗನಿಸುತ್ತಿದೆ?`,
+      'ml-IN': `നമസ്കാരം ${firstName}! നിങ്ങൾ ലോഗിൻ ചെയ്തിരിക്കുന്നു, നിങ്ങളുടെ മരുന്ന് ഷെഡ്യൂൾ തയ്യാറാണ്. ഇന്ന് നിങ്ങൾക്ക് എങ്ങനെ തോന്നുന്നു?`,
       'pa-IN': `ਸਤਿ ਸ਼੍ਰੀ ਅਕਾਲ ${firstName}! ਤੁਸੀਂ ਲੌਗਇਨ ਹੋ ਅਤੇ ਮੈਂ ਤੁਹਾਡੀ ਦਵਾਈਆਂ ਦੀ ਸਮਾਂ-ਸਾਰਣੀ ਨਾਲ ਤਿਆਰ ਹਾਂ। ਅੱਜ ਤੁਸੀਂ ਕਿਵੇਂ ਮਹਿਸੂਸ ਕਰ ਰਹੇ ਹੋ?`,
       'es-ES': `¡Hola ${firstName}! Su horario de medicamentos está listo. ¿Cómo se siente hoy?`,
       'en-US': `Hello ${firstName}! You are logged in, and I am right here with your daily medication schedule. How can I help you today?`,
@@ -298,6 +298,23 @@ export const VoiceAssistantOrb: React.FC = () => {
                 >
                   <Volume2 className="w-3.5 h-3.5 text-sage-600" />
                   <span>{t('greetPatient', { name: patientName.split(' ')[0] })}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    soundEffects.playTap();
+                    setIsSpeaking(true);
+                    try {
+                      await testFemaleVoice(language);
+                    } finally {
+                      setIsSpeaking(false);
+                    }
+                  }}
+                  aria-label="Test warm companion voice in current language"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-800 text-xs font-bold rounded-xl border border-rose-200 transition-all shrink-0 active:scale-95 shadow-xs"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-rose-600" />
+                  <span>{t('testVoice')}</span>
                 </button>
               </div>
             </div>

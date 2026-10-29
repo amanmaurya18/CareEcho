@@ -167,7 +167,7 @@ const FEMALE_VOICE_KEYWORDS = [
   // Windows / Edge Natural Voices & Indic Voices
   'jenny', 'aria', 'zira', 'michelle', 'ana', 'neerja', 'heera', 'swara',
   'elena', 'laura', 'sabrina', 'alva', 'sonia', 'shruti', 'asmita', 'dhwani',
-  'sapna', 'sobhana', 'tanishaa', 'raavi', 'kalpana', 'ananya', 'sunita',
+  'sapna', 'sobhana', 'tanishaa', 'raavi', 'kalpana', 'ananya', 'sunita', 'pallavi', 'aarohi', 'elvira', 'lekha', 'mónica', 'monica', 'paulina',
   // Apple / Safari / macOS / iOS
   'samantha', 'victoria', 'karen', 'ava', 'susan', 'allison', 'fiona', 'moira', 'tessa', 'nora',
   // Google / Android / Chrome
@@ -176,7 +176,7 @@ const FEMALE_VOICE_KEYWORDS = [
 
 const MALE_VOICE_KEYWORDS = [
   'david', 'mark', 'george', 'daniel', 'guy', 'richard', 'stefan', 'male', 'man', 'boy',
-  'madhur', 'hemant', 'valluvar', 'mohan', 'niranjan', 'gagan', 'midhun', 'bashkar',
+  'madhur', 'hemant', 'valluvar', 'mohan', 'niranjan', 'gagan', 'midhun', 'bashkar', 'ojas', 'alvaro', 'jorge', 'manohara',
 ];
 
 // Active pool to prevent Chromium V8 garbage collection of utterances during playback
@@ -216,9 +216,9 @@ if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
 }
 
 // Clean and sanitize text for natural speech synthesis
-export function sanitizeTextForSpeech(text: string): string {
+export function sanitizeTextForSpeech(text: string, lang: string = 'en-US'): string {
   if (!text) return '';
-  return text
+  let cleaned = text
     // Remove markdown formatting
     .replace(/[*_~`#]/g, '')
     // Remove Markdown links [text](url) -> text
@@ -231,22 +231,99 @@ export function sanitizeTextForSpeech(text: string): string {
     .replace(/[\u2013\u2014]/g, ', ')
     .replace(/[•·]/g, ', ')
     // Remove Emojis and miscellaneous symbols that trip speech engines
-    .replace(/([\uD800-\uDBFF][\uDC00-\uDFFF]|[\u2600-\u27BF])/g, '')
-    // Replace common medical abbreviations for clear pronunciation
-    .replace(/\bmg\b/gi, ' milligrams ')
-    .replace(/\bml\b/gi, ' milliliters ')
-    .replace(/\btab\b/gi, ' tablet ')
-    .replace(/\bcap\b/gi, ' capsule ')
-    .replace(/\bbp\b/gi, ' blood pressure ')
-    .replace(/\bhr\b/gi, ' heart rate ')
-    // Normalize punctuation and whitespace
-    .replace(/\s+/g, ' ')
-    .trim();
+    .replace(/([\uD800-\uDBFF][\uDC00-\uDFFF]|[\u2600-\u27BF])/g, '');
+
+  const langPrefix = lang.toLowerCase().split(/[-_]/)[0];
+
+  // Localized medical units for speech synthesis
+  if (langPrefix === 'hi') {
+    cleaned = cleaned
+      .replace(/\bmg\b/gi, ' मिलीग्राम ')
+      .replace(/\bml\b/gi, ' मिलीलीटर ')
+      .replace(/\btab\b/gi, ' गोली ')
+      .replace(/\bcap\b/gi, ' कैप्सूल ')
+      .replace(/\bbp\b/gi, ' बीपी ')
+      .replace(/\bhr\b/gi, ' हृदय गति ');
+  } else if (langPrefix === 'es') {
+    cleaned = cleaned
+      .replace(/\bmg\b/gi, ' miligramos ')
+      .replace(/\bml\b/gi, ' mililitros ')
+      .replace(/\btab\b/gi, ' tableta ')
+      .replace(/\bcap\b/gi, ' cápsula ')
+      .replace(/\bbp\b/gi, ' presión arterial ')
+      .replace(/\bhr\b/gi, ' frecuencia cardíaca ');
+  } else if (langPrefix === 'ta') {
+    cleaned = cleaned
+      .replace(/\bmg\b/gi, ' மில்லிகிராம் ')
+      .replace(/\bml\b/gi, ' மில்லிலிட்டர் ')
+      .replace(/\btab\b/gi, ' மாத்திரை ')
+      .replace(/\bcap\b/gi, ' காப்ஸ்யூல் ')
+      .replace(/\bbp\b/gi, ' இரத்த அழுத்தம் ');
+  } else if (langPrefix === 'te') {
+    cleaned = cleaned
+      .replace(/\bmg\b/gi, ' మిల్లీగ్రాములు ')
+      .replace(/\bml\b/gi, ' మిల్లీలీటర్లు ')
+      .replace(/\btab\b/gi, ' టాబ్లెట్ ')
+      .replace(/\bcap\b/gi, ' క్యాప్సూల్ ')
+      .replace(/\bbp\b/gi, ' రక్తపోటు ');
+  } else if (langPrefix === 'bn') {
+    cleaned = cleaned
+      .replace(/\bmg\b/gi, ' মিলিগ্রাম ')
+      .replace(/\bml\b/gi, ' মিলিলিটার ')
+      .replace(/\btab\b/gi, ' ট্যাবলেট ')
+      .replace(/\bcap\b/gi, ' ক্যাপসুল ')
+      .replace(/\bbp\b/gi, ' রক্তচাপ ');
+  } else if (langPrefix === 'mr') {
+    cleaned = cleaned
+      .replace(/\bmg\b/gi, ' मिलीग्रॅम ')
+      .replace(/\bml\b/gi, ' मिलीलीटर ')
+      .replace(/\btab\b/gi, ' गोळी ')
+      .replace(/\bcap\b/gi, ' कॅप्सूल ')
+      .replace(/\bbp\b/gi, ' रक्तदाब ');
+  } else if (langPrefix === 'gu') {
+    cleaned = cleaned
+      .replace(/\bmg\b/gi, ' મિલીગ્રામ ')
+      .replace(/\bml\b/gi, ' મિલીલીટર ')
+      .replace(/\btab\b/gi, ' ગોળી ')
+      .replace(/\bcap\b/gi, ' કેપ્સ્યુલ ')
+      .replace(/\bbp\b/gi, ' બ્લડ પ્રેશર ');
+  } else if (langPrefix === 'kn') {
+    cleaned = cleaned
+      .replace(/\bmg\b/gi, ' ಮಿಲಿಗ್ರಾಂ ')
+      .replace(/\bml\b/gi, ' ಮಿಲಿಲೀಟರ್ ')
+      .replace(/\btab\b/gi, ' ಮಾತ್ರೆ ')
+      .replace(/\bcap\b/gi, ' ಕ್ಯಾಪ್ಸುಲ್ ')
+      .replace(/\bbp\b/gi, ' ರಕ್ತದೊತ್ತಡ ');
+  } else if (langPrefix === 'ml') {
+    cleaned = cleaned
+      .replace(/\bmg\b/gi, ' മില്ലിഗ്രാം ')
+      .replace(/\bml\b/gi, ' മില്ലിലിറ്റർ ')
+      .replace(/\btab\b/gi, ' ഗുളിക ')
+      .replace(/\bcap\b/gi, ' കാപ്സ്യൂൾ ')
+      .replace(/\bbp\b/gi, ' രക്തസമ്മർദ്ദം ');
+  } else if (langPrefix === 'pa') {
+    cleaned = cleaned
+      .replace(/\bmg\b/gi, ' ਮਿਲੀਗ੍ਰਾਮ ')
+      .replace(/\bml\b/gi, ' ਮਿਲੀਲੀਟਰ ')
+      .replace(/\btab\b/gi, ' ਗੋਲੀ ')
+      .replace(/\bcap\b/gi, ' ਕੈਪਸੂਲ ')
+      .replace(/\bbp\b/gi, ' ਬਲੱਡ ਪ੍ਰੈਸ਼ਰ ');
+  } else {
+    cleaned = cleaned
+      .replace(/\bmg\b/gi, ' milligrams ')
+      .replace(/\bml\b/gi, ' milliliters ')
+      .replace(/\btab\b/gi, ' tablet ')
+      .replace(/\bcap\b/gi, ' capsule ')
+      .replace(/\bbp\b/gi, ' blood pressure ')
+      .replace(/\bhr\b/gi, ' heart rate ');
+  }
+
+  return cleaned.replace(/\s+/g, ' ').trim();
 }
 
 // Split large text into natural, digestible chunks without truncating
-export function splitIntoSentences(text: string): string[] {
-  const cleaned = sanitizeTextForSpeech(text);
+export function splitIntoSentences(text: string, lang: string = 'en-US'): string[] {
+  const cleaned = sanitizeTextForSpeech(text, lang);
   if (!cleaned) return [];
 
   // If text is short or medium length (<= 300 characters), never chop it
@@ -336,17 +413,17 @@ export function findBestVoice(
 
   // Specific keyword identifiers for Indian and global languages
   const languageKeywordsMap: Record<string, string[]> = {
-    hi: ['hindi', 'hi-in', 'swara', 'heera', 'kalpana', 'madhur', 'google हिन्दी'],
-    ta: ['tamil', 'ta-in', 'valluvar'],
-    te: ['telugu', 'te-in', 'shruti', 'mohan'],
-    bn: ['bengali', 'bn-in', 'bangla', 'tanishaa', 'bashkar'],
-    mr: ['marathi', 'mr-in', 'asmita'],
-    gu: ['gujarati', 'gu-in', 'dhwani', 'niranjan'],
-    kn: ['kannada', 'kn-in', 'sapna', 'gagan'],
-    ml: ['malayalam', 'ml-in', 'sobhana', 'midhun'],
-    pa: ['punjabi', 'pa-in', 'raavi'],
-    es: ['spanish', 'es-es', 'es-us', 'español', 'elena', 'laura', 'sabina'],
-    en: ['english', 'en-us', 'en-gb', 'en-in', 'zira', 'jenny', 'aria', 'david', 'mark'],
+    hi: ['hindi', 'hi-in', 'hi_in', 'swara', 'heera', 'kalpana', 'madhur', 'lekha', 'google हिन्दी'],
+    ta: ['tamil', 'ta-in', 'ta_in', 'valluvar', 'pallavi', 'google தமிழ்'],
+    te: ['telugu', 'te-in', 'te_in', 'shruti', 'mohan', 'google తెలుగు'],
+    bn: ['bengali', 'bn-in', 'bn_in', 'bangla', 'tanishaa', 'bashkar', 'google বাংলা'],
+    mr: ['marathi', 'mr-in', 'mr_in', 'asmita', 'aarohi', 'manohara', 'google मराठी'],
+    gu: ['gujarati', 'gu-in', 'gu_in', 'dhwani', 'niranjan', 'google ગુજરાતી'],
+    kn: ['kannada', 'kn-in', 'kn_in', 'sapna', 'gagan', 'google ಕನ್ನಡ'],
+    ml: ['malayalam', 'ml-in', 'ml_in', 'sobhana', 'midhun', 'google മലയാളം'],
+    pa: ['punjabi', 'pa-in', 'pa_in', 'raavi', 'ojas', 'gurmukhi', 'google ਪੰਜਾਬੀ'],
+    es: ['spanish', 'es-es', 'es-us', 'es_es', 'es_us', 'español', 'elena', 'laura', 'sabina', 'elvira', 'alvaro', 'mónica', 'monica', 'paulina', 'jorge', 'google español'],
+    en: ['english', 'en-us', 'en-gb', 'en-in', 'en_us', 'en_gb', 'en_in', 'zira', 'jenny', 'aria', 'david', 'mark', 'samantha', 'karen', 'george', 'google us english'],
   };
 
   const currentKeywords = languageKeywordsMap[langPrefix] || [langPrefix];
@@ -391,7 +468,14 @@ export function findBestVoice(
     return matchingVoices[0];
   }
 
-  // 2. Fallback: English female or default system voice
+  // CRITICAL: If the target language is NOT English, NEVER return an English fallback voice!
+  // Assigning an English voice causes non-English text to fail or sound like distorted English.
+  // Returning null allows the browser engine to use its native/cloud synthesizer for utterance.lang!
+  if (langPrefix !== 'en') {
+    return null;
+  }
+
+  // 2. Fallback for English: English female or default system voice
   const englishFemaleVoice = voices.find((v) => {
     const langMatch = v.lang.toLowerCase().startsWith('en');
     const name = v.name.toLowerCase();
@@ -430,11 +514,19 @@ function speakChunk(
     utterance.rate = 0.90; // Gentle, clear cadence for elderly reassurance
     utterance.pitch = gender === 'female' ? 1.05 : 0.95;
 
+    // Always ensure utterance.lang is explicitly set to the requested language
+    utterance.lang = lang;
+
     if (voice) {
-      utterance.voice = voice;
-      utterance.lang = voice.lang || lang;
-    } else {
-      utterance.lang = lang;
+      const voiceLangPrefix = (voice.lang || '').toLowerCase().split(/[-_]/)[0];
+      const targetLangPrefix = lang.toLowerCase().split(/[-_]/)[0];
+      // Only set voice if it matches the target language prefix
+      if (voiceLangPrefix === targetLangPrefix || !voiceLangPrefix) {
+        utterance.voice = voice;
+        if (voice.lang) {
+          utterance.lang = voice.lang;
+        }
+      }
     }
 
     // Pin utterance in global active pool to prevent Chromium GC cancellation
@@ -494,7 +586,7 @@ export async function speakText(
     return;
   }
 
-  const cleaned = sanitizeTextForSpeech(text);
+  const cleaned = sanitizeTextForSpeech(text, lang);
   if (!cleaned) return;
 
   // Cancel any prior speech cleanly
@@ -521,7 +613,7 @@ export async function speakText(
   }
 
   // Only for very long texts (> 300 chars), split into large chunk paragraphs
-  const chunks = splitIntoSentences(cleaned);
+  const chunks = splitIntoSentences(cleaned, lang);
   for (let i = 0; i < chunks.length; i++) {
     const chunk = chunks[i];
     await speakChunk(chunk, selectedVoice, lang, gender);
@@ -532,7 +624,7 @@ export async function speakText(
 }
 
 // Quick helper to preview/test the warm voice across Indian and global languages
-export async function testFemaleVoice(lang: string = 'en-US'): Promise<void> {
+export async function testVoice(lang: string = 'en-US', gender: 'female' | 'male' = 'female'): Promise<void> {
   const samples: Record<string, string> = {
     'hi-IN': 'नमस्ते! मैं आपका स्वास्थ्य साथी CareEcho हूँ। आपकी सेहत का ध्यान रखना मेरी प्राथमिकता है।',
     'ta-IN': 'வணக்கம்! நான் உங்கள் ஆரோக்கியத் தோழன் CareEcho. உங்கள் மருந்துகளை நினைவூட்டுவது எனது பணி.',
@@ -548,6 +640,8 @@ export async function testFemaleVoice(lang: string = 'en-US'): Promise<void> {
   };
 
   const sampleText = samples[lang] || samples['en-US'];
-  await speakText(sampleText, lang, 'female');
+  await speakText(sampleText, lang, gender);
 }
+
+export const testFemaleVoice = (lang: string = 'en-US') => testVoice(lang, 'female');
 

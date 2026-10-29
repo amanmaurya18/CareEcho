@@ -87,6 +87,7 @@ export type TranslationKey =
   | 'femaleVoice'
   | 'scheduledFor'
   | 'greetPatient'
+  | 'testVoice'
   | 'listeningSpeakClearly'
   | 'careEchoThinking'
   | 'speakingResponse'
@@ -184,6 +185,7 @@ export const TRANSLATIONS: Record<SupportedLanguage, Record<TranslationKey, stri
     femaleVoice: 'Female Voice',
     scheduledFor: 'Scheduled for {time} ({slot})',
     greetPatient: 'Greet {name}',
+    testVoice: 'Hear Voice',
     listeningSpeakClearly: 'Listening... Speak clearly',
     careEchoThinking: 'CareEcho is thinking...',
     speakingResponse: 'Speaking response...',
@@ -280,6 +282,7 @@ export const TRANSLATIONS: Record<SupportedLanguage, Record<TranslationKey, stri
     femaleVoice: 'महिला आवाज़',
     scheduledFor: '{time} बजे निर्धारित ({slot})',
     greetPatient: '{name} का अभिवादन करें',
+    testVoice: 'आवाज़ सुनें',
     listeningSpeakClearly: 'सुन रहा हूँ... साफ़ बोलें',
     careEchoThinking: 'CareEcho सोच रहा है...',
     speakingResponse: 'उत्तर बोल रहा है...',
@@ -376,6 +379,7 @@ export const TRANSLATIONS: Record<SupportedLanguage, Record<TranslationKey, stri
     femaleVoice: 'Voz Femenina',
     scheduledFor: 'Programado para las {time} ({slot})',
     greetPatient: 'Saludar a {name}',
+    testVoice: 'Probar voz',
     listeningSpeakClearly: 'Escuchando... Hable claramente',
     careEchoThinking: 'CareEcho está pensando...',
     speakingResponse: 'Respondiendo...',
@@ -472,6 +476,7 @@ export const TRANSLATIONS: Record<SupportedLanguage, Record<TranslationKey, stri
     femaleVoice: 'பெண் குரல்',
     scheduledFor: '{time} மணிக்கு திட்டமிடப்பட்டது ({slot})',
     greetPatient: '{name}-ஐ வாழ்த்தவும்',
+    testVoice: 'குரல் கேட்க',
     listeningSpeakClearly: 'கேட்கிறது... தெளிவாகப் பேசுங்கள்',
     careEchoThinking: 'CareEcho சிந்திக்கிறது...',
     speakingResponse: 'பதில் கூறுகிறது...',
@@ -568,6 +573,7 @@ export const TRANSLATIONS: Record<SupportedLanguage, Record<TranslationKey, stri
     femaleVoice: 'మహిళా స్వరం',
     scheduledFor: '{time} కు నిర్ణయించబడింది ({slot})',
     greetPatient: '{name}ని పలకరించండి',
+    testVoice: 'వాయిస్ వినండి',
     listeningSpeakClearly: 'వింటోంది... స్పష్టంగా మాట్లాడండి',
     careEchoThinking: 'CareEcho ఆలోచిస్తోంది...',
     speakingResponse: 'సమాధానం చెబుతోంది...',
@@ -664,6 +670,7 @@ export const TRANSLATIONS: Record<SupportedLanguage, Record<TranslationKey, stri
     femaleVoice: 'মহিলা কণ্ঠস্বর',
     scheduledFor: '{time}-এ নির্ধারিত ({slot})',
     greetPatient: '{name}-কে অভিবাদন জানান',
+    testVoice: 'কণ্ঠস্বর শুনুন',
     listeningSpeakClearly: 'শুনছি... স্পষ্ট করে বলুন',
     careEchoThinking: 'CareEcho চিন্তা করছে...',
     speakingResponse: 'উত্তর বলছে...',
@@ -760,6 +767,7 @@ export const TRANSLATIONS: Record<SupportedLanguage, Record<TranslationKey, stri
     femaleVoice: 'स्त्री आवाज',
     scheduledFor: '{time} वाजता निर्धारित ({slot})',
     greetPatient: '{name} चे स्वागत करा',
+    testVoice: 'आवाज ऐका',
     listeningSpeakClearly: 'ऐकत आहे... स्पष्ट बोला',
     careEchoThinking: 'CareEcho विचार करत आहे...',
     speakingResponse: 'उत्तर बोलत आहे...',
@@ -856,6 +864,7 @@ export const TRANSLATIONS: Record<SupportedLanguage, Record<TranslationKey, stri
     femaleVoice: 'સ્ત્રી અવાજ',
     scheduledFor: '{time} વાગ્યે નિર્ધારિત ({slot})',
     greetPatient: '{name}નું સ્વાગત કરો',
+    testVoice: 'અવાજ સાંભળો',
     listeningSpeakClearly: 'સાંભળી રહ્યું છે... સ્પષ્ટ બોલો',
     careEchoThinking: 'CareEcho વિચારી રહ્યું છે...',
     speakingResponse: 'જવાબ બોલી રહ્યું છે...',
@@ -952,6 +961,7 @@ export const TRANSLATIONS: Record<SupportedLanguage, Record<TranslationKey, stri
     femaleVoice: 'ಮಹಿಳಾ ಧ್ವನಿ',
     scheduledFor: '{time} ಕ್ಕೆ ನಿಗದಿಯಾಗಿದೆ ({slot})',
     greetPatient: '{name} ಅವರನ್ನು ಸ್ವಾಗತಿಸಿ',
+    testVoice: 'ಧ್ವನಿ ಆಲಿಸಿ',
     listeningSpeakClearly: 'ಕೇಳಿಸಿಕೊಳ್ಳುತ್ತಿದೆ... ಸ್ಪಷ್ಟವಾಗಿ ಮಾತನಾಡಿ',
     careEchoThinking: 'CareEcho ಯೋಚಿಸುತ್ತಿದೆ...',
     speakingResponse: 'ಉತ್ತರಿಸುತ್ತಿದೆ...',
@@ -1048,6 +1058,7 @@ export const TRANSLATIONS: Record<SupportedLanguage, Record<TranslationKey, stri
     femaleVoice: 'സ്ത്രീ ശബ്ദം',
     scheduledFor: '{time}-ന് നിശ്ചയിച്ചു ({slot})',
     greetPatient: '{name}-നെ അഭിവാദ്യം ചെയ്യുക',
+    testVoice: 'ശബ്ദം കേൾക്കുക',
     listeningSpeakClearly: 'കേൾക്കുന്നു... വ്യക്തമായി സംസാരിക്കുക',
     careEchoThinking: 'CareEcho ചിന്തിക്കുന്നു...',
     speakingResponse: 'മറുപടി പറയുന്നു...',
@@ -1144,6 +1155,7 @@ export const TRANSLATIONS: Record<SupportedLanguage, Record<TranslationKey, stri
     femaleVoice: 'ਮਹਿਲਾ ਆਵਾਜ਼',
     scheduledFor: '{time} ਵਜੇ ਨਿਰਧਾਰਤ ({slot})',
     greetPatient: '{name} ਨੂੰ ਜੀ ਆਇਆਂ ਕਹੋ',
+    testVoice: 'ਆਵਾਜ਼ ਸੁਣੋ',
     listeningSpeakClearly: 'ਸੁਣ ਰਿਹਾ ਹੈ... ਸਾਫ਼ ਬੋਲੋ',
     careEchoThinking: 'CareEcho ਸੋਚ ਰਿਹਾ ਹੈ...',
     speakingResponse: 'ਜਵਾਬ ਬੋਲ ਰਿਹਾ ਹੈ...',
