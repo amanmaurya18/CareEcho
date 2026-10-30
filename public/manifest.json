@@ -1,0 +1,66 @@
+{
+  "name": "CareEcho — Senior Health & Medication Companion",
+  "short_name": "CareEcho",
+  "description": "Accessible, voice-first medication schedule and multimodal companion for older adults and their loved ones.",
+  "start_url": "/",
+  "id": "/",
+  "display": "standalone",
+  "background_color": "#FBFBFA",
+  "theme_color": "#388E67",
+  "orientation": "portrait-primary",
+  "categories": [
+    "medical",
+    "health",
+    "lifestyle"
+  ],
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Daily Schedule",
+      "url": "/",
+      "description": "Check today's medication routine"
+    },
+    {
+      "name": "Caregiver Portal",
+      "url": "/caregiver",
+      "description": "View elder adherence and safety alerts"
+    },
+    {
+      "name": "Scan Prescription",
+      "url": "/scan",
+      "description": "Scan an Rx prescription using Smart OCR"
+    }
+  ],
+  "prefer_related_applications": false
+}
