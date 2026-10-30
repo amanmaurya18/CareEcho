@@ -18,7 +18,7 @@ import {
   INITIAL_VOICE_CHECKINS,
   INITIAL_ALERTS,
 } from '@/lib/mockData';
-import { soundEffects, speakText } from '@/lib/audio';
+import { soundEffects, speakText, stopAllSpeech } from '@/lib/audio';
 import { useSession } from 'next-auth/react';
 import {
   getTranslation,
@@ -219,11 +219,13 @@ export const CareProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const stopAlarm = () => {
     soundEffects.stopAlarm();
+    stopAllSpeech();
     setActiveAlarmMedication(null);
   };
 
   const snoozeAlarm = (medId: string, minutes: number = 5) => {
     soundEffects.stopAlarm();
+    stopAllSpeech();
     setSnoozedMeds((prev) => ({
       ...prev,
       [medId]: Date.now() + minutes * 60 * 1000,
@@ -233,6 +235,7 @@ export const CareProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const dismissAlarm = (medId: string) => {
     soundEffects.stopAlarm();
+    stopAllSpeech();
     setDismissedMeds((prev) => ({
       ...prev,
       [medId]: true,
@@ -242,6 +245,7 @@ export const CareProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const takeMedicineFromAlarm = (medId: string) => {
     soundEffects.stopAlarm();
+    stopAllSpeech();
     setActiveAlarmMedication(null);
     markAsTaken(medId);
   };

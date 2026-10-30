@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useCare } from '@/context/CareContext';
-import { speakText, soundEffects } from '@/lib/audio';
+import { speakText, soundEffects, stopAllSpeech } from '@/lib/audio';
 import { Check, Volume2, Pill, Clock, Sparkles, AlertCircle, Droplets, Wind, Syringe, Bell } from 'lucide-react';
 
 export const CurrentDoseBanner: React.FC = () => {
@@ -83,6 +83,11 @@ export const CurrentDoseBanner: React.FC = () => {
 
   const handleReadAloud = async () => {
     soundEffects.playTap();
+    if (isSpeaking) {
+      stopAllSpeech();
+      setIsSpeaking(false);
+      return;
+    }
     setIsSpeaking(true);
     let speechText = t('nextMedicationSpoken', {
       name: nextMedication.name,

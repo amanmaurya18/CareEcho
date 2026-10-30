@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useCare } from '@/context/CareContext';
-import { soundEffects, speakText, testFemaleVoice } from '@/lib/audio';
+import { soundEffects, speakText, testFemaleVoice, stopAllSpeech } from '@/lib/audio';
 import { Mic, MicOff, Volume2, Sparkles, X, MessageSquare, Send } from 'lucide-react';
 
 interface SpeechRecognitionEvent {
@@ -44,6 +44,8 @@ export const VoiceAssistantOrb: React.FC = () => {
   const [errorMsg, setErrorMsg] = useState('');
 
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
+  const latestTranscriptRef = useRef<string>('');
+  const isProcessingRef = useRef<boolean>(false);
 
   // Initialize SpeechRecognition if available
   useEffect(() => {
@@ -122,6 +124,7 @@ export const VoiceAssistantOrb: React.FC = () => {
   };
 
   const processVoiceQuery = async (queryText: string) => {
+    isProcessingRef.current = true;
     setIsThinking(true);
     setErrorMsg('');
 
@@ -166,6 +169,7 @@ export const VoiceAssistantOrb: React.FC = () => {
       }
     } finally {
       setIsThinking(false);
+      isProcessingRef.current = false;
     }
   };
 
@@ -238,6 +242,8 @@ export const VoiceAssistantOrb: React.FC = () => {
                     recognitionRef.current.abort();
                   } catch {}
                 }
+                stopAllSpeech();
+                setIsSpeaking(false);
                 setIsOpen(false);
               }}
               aria-label="Close voice assistant dialog"
@@ -322,7 +328,7 @@ export const VoiceAssistantOrb: React.FC = () => {
             {/* Large Interactive Pulsing Orb Display */}
             <div className="flex flex-col items-center justify-center py-6">
               <div
-                onClick={isListening ? stopListeningAndProcess : startListening}
+                onClick={isListening ? stopListeningAndProcess : isSpeaking ? () => { stopAllSpeech(); setIsSpeaking(false); } : startListening}
                 role="button"
                 tabIndex={0}
                 aria-label={isListening ? 'Stop listening' : 'Start listening'}

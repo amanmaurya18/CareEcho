@@ -577,23 +577,128 @@ function speakChunk(
 }
 
 // Main speakText function: speaks all content completely without premature cutoff
+// Global reference to active HTML5 audio element
+let activeAudio: HTMLAudioElement | null = null;
+
+// Cleanly stop any ongoing audio playback across both HTML5 Audio and Web Speech API
+export function stopAllSpeech(): void {
+  if (activeAudio) {
+    try {
+      activeAudio.pause();
+      activeAudio.currentTime = 0;
+      activeAudio.src = '';
+    } catch {}
+    activeAudio = null;
+  }
+  if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+    try {
+      window.speechSynthesis.cancel();
+    } catch {}
+    activeUtterances.clear();
+    stopKeepAlive();
+  }
+}
+
+// Stream and play authentic, studio-quality speech in any of the 11 languages via internal /api/tts
+async function playAudioViaApi(text: string, lang: string): Promise<boolean> {
+  if (typeof window === 'undefined') return false;
+
+  return new Promise(async (resolve) => {
+    let audioUrl = '';
+    let isObjectUrl = false;
+    let audio: HTMLAudioElement | null = null;
+    let settled = false;
+
+    const cleanup = (success: boolean) => {
+      if (settled) return;
+      settled = true;
+      if (activeAudio === audio) {
+        activeAudio = null;
+      }
+      if (isObjectUrl && audioUrl) {
+        try {
+          URL.revokeObjectURL(audioUrl);
+        } catch {}
+      }
+      resolve(success);
+    };
+
+    try {
+      // For short to medium text (up to 300 chars), use GET with edge/browser caching
+      if (text.length <= 300) {
+        audioUrl = `/api/tts?text=${encodeURIComponent(text)}&lang=${encodeURIComponent(lang)}`;
+      } else {
+        // For longer prompts, use POST to prevent URL length limits
+        const res = await fetch('/api/tts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, lang }),
+        });
+        if (!res.ok) {
+          cleanup(false);
+          return;
+        }
+        const blob = await res.blob();
+        audioUrl = URL.createObjectURL(blob);
+        isObjectUrl = true;
+      }
+
+      audio = new Audio(audioUrl);
+      activeAudio = audio;
+
+      audio.onended = () => cleanup(true);
+      audio.onerror = (e) => {
+        console.warn('API TTS playback error, falling back to Web Speech synthesis:', e);
+        cleanup(false);
+      };
+
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise.catch((err) => {
+          console.warn('HTMLAudio play failed, falling back to Web Speech synthesis:', err);
+          cleanup(false);
+        });
+      }
+    } catch (e) {
+      console.warn('playAudioViaApi error:', e);
+      cleanup(false);
+    }
+  });
+}
+
+// Main speakText function: speaks all content completely in native language without premature cutoff
 export async function speakText(
   text: string,
   lang: string = 'en-US',
   gender: 'female' | 'male' = 'female'
 ): Promise<void> {
-  if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
+  if (typeof window === 'undefined') {
     return;
   }
 
   const cleaned = sanitizeTextForSpeech(text, lang);
   if (!cleaned) return;
 
-  // Cancel any prior speech cleanly
+  // Cleanly stop any existing speech or audio
+  stopAllSpeech();
+
+  // 1. Try our high-quality native multi-language TTS stream first!
+  // This guarantees natural human pronunciation across all 11 languages (Hindi, Tamil, Telugu,
+  // Bengali, Marathi, Gujarati, Kannada, Malayalam, Punjabi, Spanish, and English)
+  // regardless of whether the user's OS has language voice packs installed.
+  const playedSuccessfully = await playAudioViaApi(cleaned, lang);
+  if (playedSuccessfully) {
+    return;
+  }
+
+  // 2. Offline / local fallback: Browser Web Speech API
+  if (!('speechSynthesis' in window)) {
+    return;
+  }
+
   try {
     if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
       window.speechSynthesis.cancel();
-      // Allow Chromium's internal audio device to reset asynchronously
       await new Promise((r) => setTimeout(r, 60));
     }
     activeUtterances.clear();
@@ -605,14 +710,11 @@ export async function speakText(
   const voices = await getAvailableVoices();
   const selectedVoice = findBestVoice(voices, lang, gender, cleaned);
 
-  // If text is standard size (<= 300 chars, covering all reminders and answers),
-  // speak as ONE single complete utterance to prevent Chromium inter-sentence drop/stalls!
   if (cleaned.length <= 300) {
     await speakChunk(cleaned, selectedVoice, lang, gender);
     return;
   }
 
-  // Only for very long texts (> 300 chars), split into large chunk paragraphs
   const chunks = splitIntoSentences(cleaned, lang);
   for (let i = 0; i < chunks.length; i++) {
     const chunk = chunks[i];
@@ -644,4 +746,3 @@ export async function testVoice(lang: string = 'en-US', gender: 'female' | 'male
 }
 
 export const testFemaleVoice = (lang: string = 'en-US') => testVoice(lang, 'female');
-

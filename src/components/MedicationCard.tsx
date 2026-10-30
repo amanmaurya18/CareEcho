@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Medication } from '@/lib/types';
 import { useCare } from '@/context/CareContext';
-import { speakText, soundEffects } from '@/lib/audio';
+import { speakText, soundEffects, stopAllSpeech } from '@/lib/audio';
 import { Check, RotateCcw, Volume2, Pill, Clock, Info, Droplets, Wind, Syringe, Edit2 } from 'lucide-react';
 
 interface MedicationCardProps {
@@ -28,6 +28,11 @@ export const MedicationCard: React.FC<MedicationCardProps> = ({ medication }) =>
 
   const handleSpeak = async () => {
     soundEffects.playTap();
+    if (isSpeaking) {
+      stopAllSpeech();
+      setIsSpeaking(false);
+      return;
+    }
     setIsSpeaking(true);
     let text = `${medication.name} ${medication.dosage}, ${t('scheduledFor', { time: medication.scheduledTime, slot: translateTimeOfDay(medication.timeOfDay) })}. ${t('directions')}: ${translateInstruction(medication.instructions)}.`;
     if (isTaken) {
