@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
 import { LoginPage } from './LoginPage';
@@ -13,9 +13,19 @@ interface AuthGateProps {
 export const AuthGate: React.FC<AuthGateProps> = ({ children }) => {
   const { data: session, status } = useSession();
   const pathname = usePathname();
+  const [loadTimedOut, setLoadTimedOut] = useState(false);
+
+  // Fallback safety timeout: If network is slow or device is offline,
+  // do not keep the user stuck on the loading screen for more than 2 seconds.
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoadTimedOut(true);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Loading state with reassuring CareEcho branding
-  if (status === 'loading') {
+  if (status === 'loading' && !loadTimedOut) {
     return (
       <div className="min-h-screen bg-[#FBFBFA] flex flex-col items-center justify-center p-4">
         <div className="relative flex items-center justify-center mb-4">
@@ -34,8 +44,8 @@ export const AuthGate: React.FC<AuthGateProps> = ({ children }) => {
     );
   }
 
-  // If unauthenticated, gate all features and show the Login Page
-  if (status === 'unauthenticated' || !session) {
+  // If unauthenticated or timed out, show the Login / Demo Landing Page
+  if (status === 'unauthenticated' || !session || loadTimedOut && !session) {
     return <LoginPage callbackUrl={pathname || '/'} />;
   }
 

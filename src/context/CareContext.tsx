@@ -215,6 +215,33 @@ export const CareProvider: React.FC<{ children: React.ReactNode }> = ({ children
       dosage: med.dosage,
     });
     speakText(spoken, language, voiceGender).catch(() => {});
+
+    // Native Android / Lockscreen Background Notification
+    if (typeof window !== 'undefined' && 'Notification' in window) {
+      if (Notification.permission === 'granted') {
+        try {
+          if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+            navigator.serviceWorker.ready.then((reg) => {
+              (reg as any).showNotification('CareEcho: ' + med.name + ' Reminder', {
+                body: patientName.split(' ')[0] + ', your ' + med.dosage + ' is due for ' + med.scheduledTime + '. Tap to mark as taken.',
+                icon: '/icons/icon-192x192.png',
+                badge: '/icons/icon-192x192.png',
+                tag: 'med-alarm-' + med.id,
+                renotify: true,
+                vibrate: [200, 100, 200],
+              });
+            });
+          } else {
+            new Notification('CareEcho: ' + med.name + ' Reminder', {
+              body: patientName.split(' ')[0] + ', your ' + med.dosage + ' is due for ' + med.scheduledTime + '.',
+              icon: '/icons/icon-192x192.png',
+            });
+          }
+        } catch (e) {
+          console.warn('Native notification notice:', e);
+        }
+      }
+    }
   };
 
   const stopAlarm = () => {
