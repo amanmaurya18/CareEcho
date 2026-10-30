@@ -31,6 +31,24 @@ interface SpeechRecognitionInstance {
   onresult: (event: SpeechRecognitionEvent) => void;
 }
 
+
+const getQuickPrompts = (lang: string): string[] => {
+  const prompts: Record<string, string[]> = {
+    'hi-IN': ['मेरी अगली दवा कब है?', 'क्या मैंने सुबह की दवा ले ली?', 'मेरी दवाइयों की सूची बताएं'],
+    'ta-IN': ['எனது அடுத்த மருந்து எப்போது?', 'காலை மருந்தை எடுத்துக்கொண்டேனா?', 'எனது மருந்துகள் விவரம்'],
+    'te-IN': ['నా తదుపరి మందు ఎప్పుడు?', 'ఉదయం మందులు వేసుకున్నానా?', 'నా మందుల వివరాలు'],
+    'bn-IN': ['আমার পরবর্তী ওষুধ কখন?', 'সকালের ওষুধ খেয়েছি কি?', 'আমার ওষুধের তালিকা'],
+    'mr-IN': ['माझे पुढील औषध कधी आहे?', 'मी सकाळचे औषध घेतले का?', 'माझी औषधांची यादी'],
+    'gu-IN': ['મારી આગળની દવા ક્યારે છે?', 'સવારની દવા લઈ લીધી?', 'મારી દવાઓની યાદી'],
+    'kn-IN': ['ನನ್ನ ಮುಂದಿನ ಔಷಧಿ ಯಾವಾಗ?', 'ಬೆಳಗಿನ ಔಷಧಿ ತಗೊಂಡಿದ್ದೀನಾ?', 'ನನ್ನ ಔಷಧಿಗಳ ಪಟ್ಟಿ'],
+    'ml-IN': ['എന്റെ അടുത്ത മരുന്ന് എപ്പോഴാണ്?', 'രാവിലത്തെ മരുന്ന് കഴിച്ചോ?', 'എന്റെ മരുന്നുകളുടെ പട്ടിക'],
+    'pa-IN': ['ਮੇਰੀ ਅਗਲੀ ਦਵਾਈ ਕਦੋਂ ਹੈ?', 'ਕੀ ਸਵੇਰ ਦੀ ਦਵਾਈ ਲੈ ਲਈ?', 'ਮੇਰੀਆਂ ਦਵਾਈਆਂ ਦੀ ਸੂਚੀ'],
+    'es-ES': ['¿Cuándo es mi próxima medicina?', '¿Tomé mis pastillas de la mañana?', 'Lista de mis medicamentos'],
+    'en-US': ['When is my next medicine?', 'Did I take morning pills?', 'List my daily medicines'],
+  };
+  return prompts[lang] || prompts['en-US'];
+};
+
 export const VoiceAssistantOrb: React.FC = () => {
   const { t, language, addVoiceCheckIn, nextMedication, patientName, voiceGender, medications } = useCare();
 
@@ -46,6 +64,10 @@ export const VoiceAssistantOrb: React.FC = () => {
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
   const latestTranscriptRef = useRef<string>('');
   const isProcessingRef = useRef<boolean>(false);
+  const processVoiceQueryRef = useRef<(text: string) => Promise<void>>(() => Promise.resolve());
+  useEffect(() => {
+    processVoiceQueryRef.current = processVoiceQuery;
+  });
 
   // Initialize SpeechRecognition if available
   useEffect(() => {
@@ -71,10 +93,15 @@ export const VoiceAssistantOrb: React.FC = () => {
             currentTranscript += event.results[i][0].transcript;
           }
           setTranscript(currentTranscript);
+          latestTranscriptRef.current = currentTranscript;
         };
 
         recognition.onend = () => {
           setIsListening(false);
+          const pendingText = latestTranscriptRef.current.trim();
+          if (pendingText && !isProcessingRef.current) {
+            processVoiceQueryRef.current(pendingText);
+          }
         };
 
         recognition.onerror = (event: { error: string }) => {
@@ -100,6 +127,7 @@ export const VoiceAssistantOrb: React.FC = () => {
   const startListening = () => {
     setErrorMsg('');
     setTranscript('');
+    latestTranscriptRef.current = '';
     if (recognitionRef.current) {
       try {
         recognitionRef.current.lang = language;
@@ -124,6 +152,8 @@ export const VoiceAssistantOrb: React.FC = () => {
   };
 
   const processVoiceQuery = async (queryText: string) => {
+    if (!queryText.trim()) return;
+    latestTranscriptRef.current = '';
     isProcessingRef.current = true;
     setIsThinking(true);
     setErrorMsg('');
@@ -408,6 +438,30 @@ export const VoiceAssistantOrb: React.FC = () => {
                 {errorMsg}
               </p>
             )}
+
+            
+            {/* Quick Ask Suggestion Chips in Current Language */}
+            <div className="mt-3 mb-2 text-left">
+              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">
+                {language === 'hi-IN' ? 'त्वरित प्रश्न:' : language === 'ta-IN' ? 'விரைவு கேள்விகள்:' : language === 'es-ES' ? 'Preguntas rápidas:' : 'Quick Questions:'}
+              </span>
+              <div className="flex flex-wrap gap-1.5">
+                {getQuickPrompts(language).map((prompt, pIdx) => (
+                  <button
+                    key={pIdx}
+                    type="button"
+                    onClick={() => {
+                      setTranscript(prompt);
+                      processVoiceQuery(prompt);
+                    }}
+                    className="text-xs px-2.5 py-1.5 rounded-xl bg-sage-50 hover:bg-sage-100 text-sage-800 border border-sage-200 font-semibold transition-all active:scale-95 shadow-xs flex items-center gap-1.5"
+                  >
+                    <span>💬</span>
+                    <span>{prompt}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
 
             {/* Accessible Fallback Input Field */}
             <form onSubmit={handleManualSubmit} className="mt-4 flex gap-2">
